@@ -36,7 +36,7 @@
 
 #define GEOIP_SILENCE 16	/* fix libgeoip < 1.6.3 */
 
-# ifdef USE_DYN_GEOIP
+# ifdef USE_RUNTIME_LINKING
 #  include <dlfcn.h>
 
 typedef void (*_GeoIP_setup_dbfilename_func)(void);

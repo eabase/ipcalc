@@ -26,7 +26,7 @@ int __attribute__((__format__(printf, 2, 3))) safe_asprintf(char **strp, const c
 void geo_ipv4_lookup(struct in_addr ip, char **country, char **ccode, char **city, char  **coord);
 void geo_ipv6_lookup(struct in6_addr *ip, char **country, char **ccode, char **city, char **coord);
 int geo_setup(void);
-#ifndef USE_DYN_GEOIP
+#ifndef USE_RUNTIME_LINKING
 # define geo_setup() 0
 #endif
 #else
@@ -38,7 +38,7 @@ int geo_setup(void);
 #ifdef USE_MAXMIND
 void mmdb_ip_lookup(const char *ip, char **country, char **ccode, char **city, char **coord);
 int mmdb_setup(void);
-#ifndef USE_DYN_GEOIP
+#ifndef USE_RUNTIME_LINKING
 # define mmdb_setup() 0
 #endif
 #else

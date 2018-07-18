@@ -18,7 +18,7 @@
 #define MAXMINDDB_LOCATION_CITY "/usr/share/GeoIP/GeoLite2-City.mmdb"
 #endif
 
-#ifdef USE_DYN_GEOIP
+#ifdef USE_RUNTIME_LINKING
 # include <dlfcn.h>
 # define LIBNAME LIBPATH"/libmaxminddb.so.0"
 
