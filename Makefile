@@ -1,4 +1,4 @@
-USE_GEOIP?=yes
+USE_GEOIP?=no
 USE_MAXMIND?=yes
 USE_DYN_GEOIP?=yes
 
@@ -12,6 +12,14 @@ CFLAGS?=-O2 -g -Wall
 LDFLAGS=$(LIBS)
 
 ifeq ($(USE_GEOIP),yes)
+ifeq ($(USE_DYN_GEOIP),yes)
+LDFLAGS+=-ldl
+CFLAGS+=-DUSE_GEOIP -DUSE_DYN_GEOIP -DLIBPATH="\"$(LIBPATH)\""
+else
+LDFLAGS+=-lGeoIP
+CFLAGS+=-DUSE_GEOIP
+endif # DYN GEOIP
+else  # GEOIP
 ifeq ($(USE_MAXMIND),yes)
 ifeq ($(USE_DYN_GEOIP),yes)
 LDFLAGS+=-ldl
@@ -19,17 +27,9 @@ CFLAGS+=-DUSE_MAXMIND -DUSE_DYN_GEOIP -DLIBPATH="\"$(LIBPATH)\""
 else
 LDFLAGS+=-lmaxminddb
 CFLAGS+=-DUSE_MAXMIND
-endif
-else
-ifeq ($(USE_DYN_GEOIP),yes)
-LDFLAGS+=-ldl
-CFLAGS+=-DUSE_GEOIP -DUSE_DYN_GEOIP -DLIBPATH="\"$(LIBPATH)\""
-else
-LDFLAGS+=-lGeoIP
-CFLAGS+=-DUSE_GEOIP
-endif
-endif
-endif
+endif # DYN MAXMIND
+endif # MAXMIND
+endif # not GEOIP
 
 all: ipcalc
 
