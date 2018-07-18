@@ -24,11 +24,11 @@ fedora.dyn_geoip:
 fedora.maxmind:
   <<: *fedora_template
   script:
-    - USE_GEOIP=yes USE_DYN_GEOIP=no USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
+    - USE_GEOIP=no USE_DYN_GEOIP=no USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
     - make check
 
 fedora.dyn_maxmind:
   <<: *fedora_template
   script:
-    - USE_GEOIP=yes USE_DYN_GEOIP=yes USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
+    - USE_GEOIP=no USE_DYN_GEOIP=yes USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
     - make check
