@@ -43,7 +43,7 @@ static MMDB_get_value_fn      pMMDB_get_value;
 static MMDB_lookup_string_fn  pMMDB_lookup_string;
 static MMDB_open_fn           pMMDB_open;
 
-int mmdb_setup(void)
+int geo_setup(void)
 {
 	static void *ld = NULL;
 	static int ret = 0;
@@ -106,7 +106,7 @@ void process_result_from_mmdb_lookup(MMDB_entry_data_s *entry_data, int status, 
     /* Else fail silently */
 }
 
-void mmdb_ip_lookup(const char *ip, char **country, char **ccode, char **city, char **coord)
+void geo_ip_lookup(const char *ip, char **country, char **ccode, char **city, char **coord)
 {
     MMDB_s mmdb;
     MMDB_entry_data_s entry_data;

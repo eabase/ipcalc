@@ -120,7 +120,7 @@ extern void _GeoIP_setup_dbfilename(void);
 #  define pGeoIP_code_by_id GeoIP_code_by_id
 # endif
 
-void geo_ipv4_lookup(struct in_addr ip, char **country, char **ccode, char **city, char **coord)
+static void geo_ipv4_lookup(struct in_addr ip, char **country, char **ccode, char **city, char **coord)
 {
 	GeoIP *gi;
 	GeoIPRecord *gir;
@@ -186,7 +186,7 @@ void geo_ipv4_lookup(struct in_addr ip, char **country, char **ccode, char **cit
 	return;
 }
 
-void geo_ipv6_lookup(struct in6_addr *ip, char **country, char **ccode, char **city, char **coord)
+static void geo_ipv6_lookup(struct in6_addr *ip, char **country, char **ccode, char **city, char **coord)
 {
 	GeoIP *gi;
 	GeoIPRecord *gir;
@@ -248,6 +248,18 @@ void geo_ipv6_lookup(struct in6_addr *ip, char **country, char **ccode, char **c
 	}
 
 	return;
+}
+
+void geo_ip_lookup(const char *ip, char **country, char **ccode, char **city, char **coord)
+{
+        struct in_addr ipv4;
+        struct in6_addr ipv6;
+        if (inet_pton(AF_INET, ip, &ipv4) == 1) {
+              geo_ipv4_lookup(ipv4, country, ccode, city, coord);
+        } else if (inet_pton(AF_INET6, ip, &ipv6) == 1) {
+              geo_ipv6_lookup(&ipv6, country, ccode, city, coord);
+        }
+        return;
 }
 
 #endif

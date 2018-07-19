@@ -710,9 +710,7 @@ int get_ipv4_info(const char *ipStr, int prefix, ip_info_st * info,
 	ipv4_prefix_to_hosts(info->hosts, sizeof(info->hosts), prefix);
 
 	if (flags & FLAG_GET_GEOIP) {
-		geo_ipv4_lookup(ip, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
-		/* Cool :-) */
-		mmdb_ip_lookup(ipStr, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
+		geo_ip_lookup(ipStr, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
 	}
 
 	if (flags & FLAG_RESOLVE_HOST) {
@@ -931,8 +929,7 @@ int get_ipv6_info(const char *ipStr, int prefix, ip_info_st * info,
 
 
 	if (flags & FLAG_GET_GEOIP) {
-		geo_ipv6_lookup(&ip6, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
-		mmdb_ip_lookup(ipStr, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
+		geo_ip_lookup(ipStr, &info->geoip_country, &info->geoip_ccode, &info->geoip_city, &info->geoip_coord);
 	}
 
 	if (flags & FLAG_RESOLVE_HOST) {
@@ -1295,11 +1292,7 @@ int main(int argc, char **argv)
 	if (hostname)
 		flags |= FLAG_RESOLVE_IP;
 
-#ifdef USE_MAXMIND
-	if (mmdb_setup() == 0 &&
-#else
 	if (geo_setup() == 0 &&
-#endif
         ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO))
 		flags |= FLAG_GET_GEOIP;
 
