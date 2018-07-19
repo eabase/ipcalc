@@ -164,7 +164,7 @@ void mmdb_ip_lookup(const char *ip, char **country, char **ccode, char **city, c
                     }
                 }
                 if (coordinates == 2) {
-                    safe_asprintf(coord, "Latitude: %f, longitude: %f", latitude, longitude);
+                    safe_asprintf(coord, "%f,%f", latitude, longitude);
                 }
             }
         }
