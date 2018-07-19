@@ -144,7 +144,9 @@ void mmdb_ip_lookup(const char *ip, char **country, char **ccode, char **city, c
             /* If the lookup was successfull and an entry was found */
             if (result.found_entry) {
                 memset(&entry_data, 0, sizeof(MMDB_entry_data_s));
-                // TODO: city is not available in the free database
+                // NOTE: Information about the city is not available in the free database, so there is not way
+                // for me to implement this functionality right now, but it should be easy to add for anyone with
+                // access to the paid databases.
                 status = pMMDB_get_value(&result.entry, &entry_data, "location", "latitude", NULL);
                 if (MMDB_SUCCESS == status) {
                     if (entry_data.has_data) {
