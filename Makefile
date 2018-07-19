@@ -80,5 +80,3 @@ check: ipcalc
 	test "$(SPLIT_LINES)" = "$(SPLIT_TOTAL)"
 	./ipcalc-tests
 
-docker-build:
-	docker build -f ./Dockerfile.tests .
