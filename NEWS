@@ -1,3 +1,7 @@
+* Version 0.2.6 (unreleased)
+- Added Meson build system
+
+
 * Version 0.2.5 (released 2019-02-18)
 - Fixed compilation with no geoinformation
 - Fixed segmentation fault when compiled with, but run without libmaxminddb.

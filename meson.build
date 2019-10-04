@@ -1,0 +1,79 @@
+project('ipcalc', 'c',
+	license : 'GPLv2',
+	version : '0.2.6'
+)
+
+src = [
+	'ipcalc.c',
+	'ipcalc-reverse.c',
+	'ipcalc-utils.c',
+	'netsplit.c'
+]
+
+args = [
+	'-DVERSION="' + meson.project_version() + '"'
+]
+
+deps = []
+
+use_maxminddb = get_option('use_maxminddb')
+use_geoip = get_option('use_geoip')
+use_runtime_linking = get_option('use_runtime_linking')
+werror = get_option('werror')
+
+# FIXME: It would be much better to fix this warning in the source rather than
+# merely suppressing it here.
+if werror
+	args += ['-Wno-error=tautological-compare']
+endif
+
+cc = meson.get_compiler('c')
+dl = cc.find_library('dl', required : use_runtime_linking)
+
+maxminddb = dependency('libmaxminddb',
+	method : 'pkg-config',
+	required : use_maxminddb
+)
+if maxminddb.found()
+	src += ['ipcalc-maxmind.c']
+	args += ['-DUSE_MAXMIND']
+	if dl.found()
+		message('linking maxminddb dynamically at runtime if it is available')
+		args += [
+			'-DUSE_RUNTIME_LINKING',
+			'-DLIBPATH="' + maxminddb.get_pkgconfig_variable('libdir') + '"'
+		]
+		deps += [dl]
+	else
+		deps += [maxminddb]
+	endif
+else
+	geoip = dependency('geoip',
+		method : 'pkg-config',
+		required : use_geoip
+	)
+	if geoip.found()
+		src += ['ipcalc-geoip.c']
+		args += ['-DUSE_GEOIP']
+		if dl.found()
+			message('linking geoip dynamically at runtime if it is available')
+			args += [
+				'-DUSE_RUNTIME_LINKING',
+				'-DLIBPATH="' + geoip.get_pkgconfig_variable('libdir') + '"'
+			]
+			deps += [dl]
+		else
+			deps += [geoip]
+		endif
+	endif
+endif
+
+ipcalc = executable('ipcalc',
+	sources : src,
+	c_args  : args,
+	dependencies : deps,
+	install : true
+)
+install_man('ipcalc.1')
+
+subdir('tests')

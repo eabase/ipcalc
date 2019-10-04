@@ -1,42 +1,52 @@
 .fedora.latest.template: &fedora_template
   image: fedora:latest
   before_script:
-    - dnf install -y GeoIP-devel libmaxminddb-devel make gcc libasan geolite2-{city,country}
+    - dnf install -y GeoIP-devel libmaxminddb-devel make meson ninja-build gcc libasan geolite2-{city,country}
 
 fedora.nogeo:
   <<: *fedora_template
   script:
+    - meson setup build -Duse_maxminddb=disabled -Duse_geoip=disabled --buildtype=plain -Dc_args="-O2 -g -Werror"
+    - ninja -C build
+    - ninja -C build test
     - USE_MAXMIND=no USE_GEOIP=no USE_RUNTIME_LINKING=no CFLAGS="-O2 -g -Werror" make
-    - make check
 
 fedora.geoip:
   <<: *fedora_template
   script:
+    - meson setup build -Duse_maxminddb=disabled -Duse_geoip=enabled -Duse_runtime_linking=disabled --buildtype=plain -Dc_args="-O2 -g -Werror"
+    - ninja -C build
+    - ninja -C build test
     - USE_GEOIP=yes USE_RUNTIME_LINKING=no USE_MAXMIND=no CFLAGS="-O2 -g -Werror" make
-    - make check
 
 fedora.dyn_geoip:
   <<: *fedora_template
   script:
+    - meson setup build -Duse_maxminddb=disabled -Duse_geoip=enabled -Duse_runtime_linking=enabled --buildtype=plain -Dc_args="-O2 -g -Werror"
+    - ninja -C build
+    - ninja -C build test
     - USE_GEOIP=yes USE_RUNTIME_LINKING=yes USE_MAXMIND=no CFLAGS="-O2 -g -Werror" make
-    - make check
 
 fedora.maxmind:
   <<: *fedora_template
   script:
+    - meson setup build -Duse_maxminddb=enabled -Duse_geoip=disabled -Duse_runtime_linking=disabled --buildtype=plain -Dc_args="-O2 -g -Werror"
+    - ninja -C build
+    - ninja -C build test
     - USE_GEOIP=no USE_RUNTIME_LINKING=no USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
-    - make check
 
 fedora.dyn_maxmind:
   <<: *fedora_template
   script:
+    - meson setup build -Duse_maxminddb=enabled -Duse_geoip=disabled -Duse_runtime_linking=enabled --buildtype=plain -Dc_args="-O2 -g -Werror"
+    - ninja -C build
+    - ninja -C build test
     - USE_GEOIP=no USE_RUNTIME_LINKING=yes USE_MAXMIND=yes CFLAGS="-O2 -g -Werror" make
-    - make check
 
 fedora.dyn_maxmind_with_asan:
   <<: *fedora_template
   script:
-    - USE_GEOIP=no USE_RUNTIME_LINKING=yes USE_MAXMIND=yes CFLAGS="-fsanitize=address -O2 -g -Werror" make
     - export ASAN_OPTIONS="detect_leaks=0"
-    - make check
-    - ./ipcalc -g 217.31.205.50
+    - meson setup build -Db_sanitize=address -Dwerror=true
+    - ninja -C build test
+    - ./build/ipcalc -g 217.31.205.50
