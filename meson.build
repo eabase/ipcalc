@@ -19,13 +19,6 @@ deps = []
 use_maxminddb = get_option('use_maxminddb')
 use_geoip = get_option('use_geoip')
 use_runtime_linking = get_option('use_runtime_linking')
-werror = get_option('werror')
-
-# FIXME: It would be much better to fix this warning in the source rather than
-# merely suppressing it here.
-if werror
-	args += ['-Wno-error=tautological-compare']
-endif
 
 cc = meson.get_compiler('c')
 dl = cc.find_library('dl', required : use_runtime_linking)

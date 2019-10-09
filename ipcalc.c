@@ -796,7 +796,7 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	     12) == 0)
 		return "Discard-Only Address Block";
 
-	if ((word1 & 0xfffe) == 0x2001 && word2 == 0)
+	if (prefix >= 23 && word1 == 0x2001 && (word2 & 0xff00) <= 0x100)
 		return "IETF Protocol Assignments";
 
 	if ((word1 & 0xe000) == 0x2000) {

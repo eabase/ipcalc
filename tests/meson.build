@@ -251,6 +251,14 @@ test('TestHumanReadableGenericInfoNoPrefix',
 		files('i-2a03:2880:20:4f06:face:b00c:0:1')
 	]
 )
+test('TestHumanReadableIETFProtocolAssignments',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:190:70::e86a:0:b',
+		files('i-2001:190:70::e86a:0:b')
+	]
+)
 test('TestHumanReadableGenericInfoPrefix48',
 	testrunner,
 	args : [
@@ -355,7 +363,6 @@ test('ValidateReservedIPv6WithPrefix',
 )
 
 # --check invalid input tests
-
 test('NoValidateInvalidHexIPv6',
 	testrunner,
 	args : [
