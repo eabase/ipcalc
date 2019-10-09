@@ -1,6 +1,7 @@
 * Version 0.2.6 (unreleased)
 - Added Meson build system
 - Fixed detection of IPv6 IETF Protocol Assignments address block
+- Fixed detection of IPv6 6to4 address block
 
 
 * Version 0.2.5 (released 2019-02-18)

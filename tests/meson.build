@@ -259,6 +259,14 @@ test('TestHumanReadableIETFProtocolAssignments',
 		files('i-2001:190:70::e86a:0:b')
 	]
 )
+test('TestHumanReadable6to4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2002::34',
+		files('i-2002::34')
+	]
+)
 test('TestHumanReadableGenericInfoPrefix48',
 	testrunner,
 	args : [

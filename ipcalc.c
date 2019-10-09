@@ -799,6 +799,9 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	if (prefix >= 23 && word1 == 0x2001 && (word2 & 0xff00) <= 0x100)
 		return "IETF Protocol Assignments";
 
+	if ((word1 & 0xfffe) == 0x2002)
+		return "6to4";
+
 	if ((word1 & 0xe000) == 0x2000) {
 		return "Global Unicast";
 	}
@@ -814,9 +817,6 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	if ((net->s6_addr[0] & 0xff) == 0xff) {
 		return "Multicast";
 	}
-
-	if ((word1 & 0xfffe) == 0x2002)
-		return "6to4";
 
 	return "Reserved";
 }
