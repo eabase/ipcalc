@@ -767,7 +767,7 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	uint16_t word2 = net->s6_addr[2] << 8 | net->s6_addr[3];
 
 	/* based on IANA's iana-ipv6-special-registry and ipv6-address-space 
-	 * Updated: 2015-05-12
+	 * Updated: 2019-09-13
 	 */
 	if (prefix == 128 && memcmp
 	    (net->s6_addr,
@@ -791,16 +791,61 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	     12) == 0)
 		return "IPv4-IPv6 Translat.";
 
+	if (prefix >= 48 && memcmp
+	    (net->s6_addr, "\x00\x64\xff\x9b\x00\x01",
+	     6) == 0)
+		return "IPv4-IPv6 Translat.";
+
 	if (prefix >= 96 && memcmp
 	    (net->s6_addr, "\x10\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
 	     12) == 0)
 		return "Discard-Only Address Block";
 
+	if (prefix >= 32 && word1 == 0x2001 && word2 == 0)
+		return "TEREDO";
+
+	if (prefix == 128 && memcmp
+	    (net->s6_addr, "\x20\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01",
+	     16) == 0)
+		return "Port Control Protocol Anycast";
+
+	if (prefix == 128 && memcmp
+	    (net->s6_addr, "\x20\x01\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x02",
+	     16) == 0)
+		return "Traversal Using Relays around NAT Anycast";
+
+	if (prefix >= 48 && memcmp
+	    (net->s6_addr, "\x20\x01\x00\x02\x00\x00",
+	     6) == 0)
+		return "Benchmarking";
+
+	if (prefix >= 32 && word1 == 0x2001 && word2 == 0x3)
+		return "AMT";
+
+	if (prefix >= 48 && memcmp
+	    (net->s6_addr, "\x20\x01\x00\x04\x01\x12",
+	     6) == 0)
+		return "AS112-v6";
+
+	if (prefix >= 28 && word1 == 0x2001 && (word2 & 0xfff0) == 0x10)
+		return "Deprecated (previously ORCHID)";
+
+	if (prefix >= 28 && word1 == 0x2001 && (word2 & 0xfff0) == 0x20)
+		return "ORCHIDv2";
+
 	if (prefix >= 23 && word1 == 0x2001 && (word2 & 0xff00) <= 0x100)
 		return "IETF Protocol Assignments";
 
-	if ((word1 & 0xfffe) == 0x2002)
+	if (prefix >= 32 && word1 == 0x2001 && word2 == 0xdb8)
+		return "Documentation";
+
+	if (word1 == 0x2002)
 		return "6to4";
+
+	if (prefix >= 48 && memcmp
+	    (net->s6_addr, "\x26\x20\x00\x4f\x80\x00",
+	     6) == 0)
+		return "Direct Delegation AS112 Service";
 
 	if ((word1 & 0xe000) == 0x2000) {
 		return "Global Unicast";

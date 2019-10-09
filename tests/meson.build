@@ -251,6 +251,94 @@ test('TestHumanReadableGenericInfoNoPrefix',
 		files('i-2a03:2880:20:4f06:face:b00c:0:1')
 	]
 )
+test('TestHumanReadableTranslat96',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 64:ff9b::2100:951a',
+		files('i-64:ff9b::2100:951a')
+	]
+)
+test('TestHumanReadableTranslat48',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 64:ff9b:1:ea21:4316:55::1',
+		files('i-64:ff9b:1:ea21:4316:55::1')
+	]
+)
+test('TestHumanReadableTEREDO',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:0000:50::d78a:0:c',
+		files('i-2001:0:50::d78a:0:c')
+	]
+)
+test('TestHumanReadablePortControlProtocolAnycast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:1::1',
+		files('i-2001:1::1')
+	]
+)
+test('TestHumanReadableTraversalUsingRelays',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:1::2',
+		files('i-2001:1::2')
+	]
+)
+test('TestHumanReadableBenchmarking',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:2:0:a::5:b7f',
+		files('i-2001:2:0:a::5:b7f')
+	]
+)
+test('TestHumanReadableAMT',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:3:89:71::ab:1',
+		files('i-2001:3:89:71::ab:1')
+	]
+)
+test('TestHumanReadableAS112v6',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:4:112::6483:bd12:9010',
+		files('i-2001:4:112::6483:bd12:9010')
+	]
+)
+test('TestHumanReadableORCHID',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:1e:ab:7::',
+		files('i-2001:1e:ab:7::')
+	]
+)
+test('TestHumanReadableORCHIDv2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:2c:ab:7::',
+		files('i-2001:2c:ab:7::')
+	]
+)
+test('TestHumanReadableDocumentation',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2001:db8:329::4a',
+		files('i-2001:db8:329::4a')
+	]
+)
 test('TestHumanReadableIETFProtocolAssignments',
 	testrunner,
 	args : [
@@ -265,6 +353,30 @@ test('TestHumanReadable6to4',
 		'--test-outfile',
 		ipcalc.full_path() + ' -i 2002::34',
 		files('i-2002::34')
+	]
+)
+test('TestHumanReadableDirectDelegationAS112Service',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 2620:4f:8000::7372:ad1',
+		files('i-2620:4f:8000::7372:ad1')
+	]
+)
+test('TestHumanReadableUniqueLocalUnicast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i fc00:0:a001::bcdf:4',
+		files('i-fc00:0:a001::bcdf:4')
+	]
+)
+test('TestHumanReadableLinkScopedUnicast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i fe80::b:0:7acd:0:5',
+		files('i-fe80::b:0:7acd:0:5')
 	]
 )
 test('TestHumanReadableGenericInfoPrefix48',
