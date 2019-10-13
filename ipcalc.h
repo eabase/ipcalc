@@ -93,6 +93,7 @@ typedef struct ip_info_st {
 #define FLAG_ASSUME_CLASS_PREFIX (1<<18)
 #define FLAG_SPLIT (1<<19)
 #define FLAG_NO_DECORATE (1<<20)
+#define FLAG_SHOW_ADDRESS (1<<21)
 
 /* Flags that are not real options */
 #define FLAGS_TO_IGNORE (FLAG_GET_GEOIP|FLAG_SPLIT|FLAG_NO_DECORATE|FLAG_ASSUME_CLASS_PREFIX|(1<<16))

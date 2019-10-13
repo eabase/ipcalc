@@ -1104,6 +1104,7 @@ static const struct option long_options[] = {
 	{"all-info", 0, 0, OPT_ALLINFO},
 	{"ipv4", 0, 0, '4'},
 	{"ipv6", 0, 0, '6'},
+	{"address", 0, 0, 'a'},
 	{"broadcast", 0, 0, 'b'},
 	{"hostname", 0, 0, 'h'},
 	{"lookup-host", 1, 0, 'o'},
@@ -1145,6 +1146,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "  -6, --ipv6                      Explicitly specify the IPv6 address family\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "Specific info options:\n");
+		fprintf(stderr, "  -a, --address                   Display IP address\n");
 		fprintf(stderr, "  -b, --broadcast                 Display calculated broadcast address\n");
 		fprintf(stderr, "  -m, --netmask                   Display netmask for IP\n");
 		fprintf(stderr, "  -n, --network                   Display network address\n");
@@ -1172,7 +1174,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "      --usage                     Display brief usage message\n");
 	} else {
 		fprintf(stderr, "Usage: ipcalc [-46sv?] [-c|--check] [-r|--random-private=STRING] [-i|--info]\n");
-		fprintf(stderr, "        [--all-info] [-4|--ipv4] [-6|--ipv6] [-b|--broadcast]\n");
+		fprintf(stderr, "        [--all-info] [-4|--ipv4] [-6|--ipv6] [-a|--address] [-b|--broadcast]\n");
 		fprintf(stderr, "        [-h|--hostname] [-o|--lookup-host=STRING] [-g|--geoinfo]\n");
 		fprintf(stderr, "        [-m|--netmask] [-n|--network] [-p|--prefix] [--minaddr] [--maxaddr]\n");
 		fprintf(stderr, "        [--addresses] [--addrspace] [-s|--silent] [-v|--version]\n");
@@ -1232,7 +1234,7 @@ int main(int argc, char **argv)
 	int c;
 
 	while (1) {
-		c = getopt_long(argc, argv, "S:cr:i46bho:gmnpsv", long_options, NULL);
+		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpsv", long_options, NULL);
 		if (c == -1)
 			break;
 
@@ -1266,6 +1268,9 @@ int main(int argc, char **argv)
 				break;
 			case '6':
 				familyIPv6 = 1;
+				break;
+			case 'a':
+				flags |= FLAG_SHOW_ADDRESS;
 				break;
 			case 'b':
 				flags |= FLAG_SHOW_BROADCAST;
@@ -1552,6 +1557,13 @@ int main(int argc, char **argv)
 		}
 
 	} else if (!(flags & FLAG_SHOW_INFO)) {
+
+		if ((flags & FLAG_SHOW_ADDRESS) && !familyIPv6) {
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("ADDRESS=");
+			}
+			printf("%s\n", info.ip);
+		}
 
 		if (flags & FLAG_SHOW_NETMASK) {
 			if (! (flags & FLAG_NO_DECORATE)) {
