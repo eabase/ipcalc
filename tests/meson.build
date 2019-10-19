@@ -5,7 +5,7 @@ test('AssignClassPrefix12',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 12.15.1.5 --class-prefix',
+		ipcalc.full_path() + ' -abmnp 12.15.1.5 --class-prefix',
 		files('12.15.1.5')
 	]
 )
@@ -13,7 +13,7 @@ test('AssignClassPrefix129',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 129.15.31.5 --class-prefix',
+		ipcalc.full_path() + ' -abmnp 129.15.31.5 --class-prefix',
 		files('129.15.31.5')
 	]
 )
@@ -21,7 +21,7 @@ test('AssignClassPrefix193',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 193.92.31.0 --class-prefix',
+		ipcalc.full_path() + ' -abmnp 193.92.31.0 --class-prefix',
 		files('193.92.31.0')
 	]
 )
@@ -31,7 +31,7 @@ test('TestPrefix31',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 192.168.1.5/31',
+		ipcalc.full_path() + ' -abmnp 192.168.1.5/31',
 		files('192.168.1.5-31')
 	]
 )
@@ -39,7 +39,7 @@ test('TestPrefix24',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 10.10.10.5/24',
+		ipcalc.full_path() + ' -abmnp 10.10.10.5/24',
 		files('192.168.1.5-24')
 	]
 )
@@ -47,7 +47,7 @@ test('TestPrefix30',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 10.100.4.1/30',
+		ipcalc.full_path() + ' -abmnp 10.100.4.1/30',
 		files('192.168.1.5-30')
 	]
 )
@@ -55,7 +55,7 @@ test('TestPrefix16',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 10.100.4.1/16',
+		ipcalc.full_path() + ' -abmnp 10.100.4.1/16',
 		files('192.168.1.5-16')
 	]
 )
@@ -63,7 +63,7 @@ test('TestPrefix8',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -bmnp 10.10.10.10/8',
+		ipcalc.full_path() + ' -abmnp 10.10.10.10/8',
 		files('192.168.1.5-8')
 	]
 )
@@ -221,7 +221,7 @@ test('AllocateAddressSpacePrefix24',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' --addrspace -bmnp 193.92.150.3/24',
+		ipcalc.full_path() + ' --addrspace -abmnp 193.92.150.3/24',
 		files('193.92.150.3-24')
 	]
 )
@@ -229,7 +229,7 @@ test('AllocateAddressSpacePrefix64',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' --addrspace -bmnp fd95:6be5:0ae0:84a5::/64',
+		ipcalc.full_path() + ' --addrspace -abmnp fd95:6be5:0ae0:84a5::/64',
 		files('fd95:6be5:0ae0:84a5::-64')
 	]
 )
@@ -237,7 +237,7 @@ test('AllocateAddressSpacePrefix48',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' --addrspace -bmnp fd0b:a336:4e7d::/48',
+		ipcalc.full_path() + ' --addrspace -abmnp fd0b:a336:4e7d::/48',
 		files('fd0b:a336:4e7d::-48')
 	]
 )
