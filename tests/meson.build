@@ -753,3 +753,20 @@ test('LookupReverseDNSFromPrefix120IPv6',
 		'REVERSEDNS=3.4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.3.2.1.ip6.arpa.'
 	]
 )
+# specific info decorated & no-decorate test
+test('SpecificInfoOutput',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -abmnp --minaddr --maxaddr --addresses 192.168.2.6/24',
+		files('192.168.2.6')
+	]
+)
+test('SpecificInfoOutputNoDecorate',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -abmnp --minaddr --maxaddr --addresses --no-decorate 192.168.2.7/24',
+		files('192.168.2.7')
+	]
+)
