@@ -1558,7 +1558,7 @@ int main(int argc, char **argv)
 
 	} else if (!(flags & FLAG_SHOW_INFO)) {
 
-		if ((flags & FLAG_SHOW_ADDRESS) && !familyIPv6) {
+		if (flags & FLAG_SHOW_ADDRESS) {
 			if (! (flags & FLAG_NO_DECORATE)) {
 				printf("ADDRESS=");
 			}
