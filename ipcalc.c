@@ -1104,6 +1104,7 @@ static const struct option long_options[] = {
 	{"all-info", 0, 0, OPT_ALLINFO},
 	{"ipv4", 0, 0, '4'},
 	{"ipv6", 0, 0, '6'},
+	{"address", 0, 0, 'a'},
 	{"broadcast", 0, 0, 'b'},
 	{"hostname", 0, 0, 'h'},
 	{"lookup-host", 1, 0, 'o'},
@@ -1145,6 +1146,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "  -6, --ipv6                      Explicitly specify the IPv6 address family\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "Specific info options:\n");
+		fprintf(stderr, "  -a, --address                   Display IP address\n");
 		fprintf(stderr, "  -b, --broadcast                 Display calculated broadcast address\n");
 		fprintf(stderr, "  -m, --netmask                   Display netmask for IP\n");
 		fprintf(stderr, "  -n, --network                   Display network address\n");
@@ -1172,7 +1174,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "      --usage                     Display brief usage message\n");
 	} else {
 		fprintf(stderr, "Usage: ipcalc [-46sv?] [-c|--check] [-r|--random-private=STRING] [-i|--info]\n");
-		fprintf(stderr, "        [--all-info] [-4|--ipv4] [-6|--ipv6] [-b|--broadcast]\n");
+		fprintf(stderr, "        [--all-info] [-4|--ipv4] [-6|--ipv6] [-a|--address] [-b|--broadcast]\n");
 		fprintf(stderr, "        [-h|--hostname] [-o|--lookup-host=STRING] [-g|--geoinfo]\n");
 		fprintf(stderr, "        [-m|--netmask] [-n|--network] [-p|--prefix] [--minaddr] [--maxaddr]\n");
 		fprintf(stderr, "        [--addresses] [--addrspace] [-s|--silent] [-v|--version]\n");
@@ -1232,7 +1234,7 @@ int main(int argc, char **argv)
 	int c;
 
 	while (1) {
-		c = getopt_long(argc, argv, "S:cr:i46bho:gmnpsv", long_options, NULL);
+		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpsv", long_options, NULL);
 		if (c == -1)
 			break;
 
@@ -1266,6 +1268,9 @@ int main(int argc, char **argv)
 				break;
 			case '6':
 				familyIPv6 = 1;
+				break;
+			case 'a':
+				flags |= FLAG_SHOW_ADDRESS;
 				break;
 			case 'b':
 				flags |= FLAG_SHOW_BROADCAST;
@@ -1553,74 +1558,128 @@ int main(int argc, char **argv)
 
 	} else if (!(flags & FLAG_SHOW_INFO)) {
 
+		if (flags & FLAG_SHOW_ADDRESS) {
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("ADDRESS=");
+			}
+			printf("%s\n", info.ip);
+		}
+
 		if (flags & FLAG_SHOW_NETMASK) {
-			printf("NETMASK=%s\n", info.netmask);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("NETMASK=");
+			}
+			printf("%s\n", info.netmask);
 		}
 
 		if (flags & FLAG_SHOW_PREFIX) {
-			printf("PREFIX=%u\n", info.prefix);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("PREFIX=");
+			}
+			printf("%u\n", info.prefix);
 		}
 
 		if ((flags & FLAG_SHOW_BROADCAST) && !familyIPv6) {
-			printf("BROADCAST=%s\n", info.broadcast);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("BROADCAST=");
+			}
+			printf("%s\n", info.broadcast);
 		}
 
 		if (flags & FLAG_SHOW_NETWORK) {
-			printf("NETWORK=%s\n", info.network);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("NETWORK=");
+			}
+			printf("%s\n", info.network);
 		}
 
 		if (flags & FLAG_SHOW_REVERSE) {
-			printf("REVERSEDNS=%s\n", info.reverse_dns);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("REVERSEDNS=");
+			}
+			printf("%s\n", info.reverse_dns);
 		}
 
 		if ((flags & FLAG_SHOW_MINADDR) && info.hostmin) {
-			printf("MINADDR=%s\n", info.hostmin);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("MINADDR=");
+			}
+			printf("%s\n", info.hostmin);
 		}
 
 		if ((flags & FLAG_SHOW_MAXADDR) && info.hostmax) {
-			printf("MAXADDR=%s\n", info.hostmax);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("MAXADDR=");
+			}
+			printf("%s\n", info.hostmax);
 		}
 
 		if ((flags & FLAG_SHOW_ADDRSPACE) && info.type) {
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("ADDRSPACE=");
+			}
 			if (strchr(info.type, ' ') != NULL)
-				printf("ADDRSPACE=\"%s\"\n", info.type);
+				printf("\"%s\"\n", info.type);
 			else
-				printf("ADDRSPACE=%s\n", info.type);
+				printf("%s\n", info.type);
 		}
 
 		if ((flags & FLAG_SHOW_ADDRESSES) && info.hosts[0]) {
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("ADDRESSES=");
+			}
 			if (strchr(info.hosts, ' ') != NULL)
-				printf("ADDRESSES=\"%s\"\n", info.hosts);
+				printf("\"%s\"\n", info.hosts);
 			else
-				printf("ADDRESSES=%s\n", info.hosts);
+				printf("%s\n", info.hosts);
 		}
 
 		if ((flags & FLAG_RESOLVE_HOST) && info.hostname) {
-			printf("HOSTNAME=%s\n", info.hostname);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("HOSTNAME=");
+			}
+			printf("%s\n", info.hostname);
 		}
 
 		if (flags & FLAG_RESOLVE_IP) {
-			printf("ADDRESS=%s\n", ipStr);
+			if (! (flags & FLAG_NO_DECORATE)) {
+				printf("ADDRESS=");
+			}
+			printf("%s\n", ipStr);
 		}
 
 		if ((flags & FLAG_SHOW_GEOIP) == FLAG_SHOW_GEOIP) {
-			if (info.geoip_ccode)
-				printf("COUNTRYCODE=%s\n", info.geoip_ccode);
+			if (info.geoip_ccode) {
+				if (! (flags & FLAG_NO_DECORATE)) {
+					printf("COUNTRYCODE=");
+				}
+				printf("%s\n", info.geoip_ccode);
+			}
 			if (info.geoip_country) {
+				if (! (flags & FLAG_NO_DECORATE)) {
+					printf("COUNTRY=");
+				}
 				if (strchr(info.geoip_country, ' ') != NULL)
-					printf("COUNTRY=\"%s\"\n", info.geoip_country);
+					printf("\"%s\"\n", info.geoip_country);
 				else
-					printf("COUNTRY=%s\n", info.geoip_country);
+					printf("%s\n", info.geoip_country);
 			}
 			if (info.geoip_city) {
+				if (! (flags & FLAG_NO_DECORATE)) {
+					printf("CITY=");
+				}
 				if (strchr(info.geoip_city, ' ') != NULL) {
-					printf("CITY=\"%s\"\n", info.geoip_city);
+					printf("\"%s\"\n", info.geoip_city);
 				} else {
-					printf("CITY=%s\n", info.geoip_city);
+					printf("%s\n", info.geoip_city);
 				}
 			}
-			if (info.geoip_coord)
-				printf("COORDINATES=\"%s\"\n", info.geoip_coord);
+			if (info.geoip_coord) {
+				if (! (flags & FLAG_NO_DECORATE)) {
+					printf("COORDINATES=");
+				}
+				printf("\"%s\"\n", info.geoip_coord);
+			}
 		}
 	}
 
