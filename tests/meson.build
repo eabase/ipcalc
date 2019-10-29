@@ -770,3 +770,19 @@ test('SpecificInfoOutputNoDecorate',
 		files('192.168.2.7')
 	]
 )
+test('AllInfo',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' --all-info 192.168.2.7/24',
+		files('all-info-192.168.2.7')
+	]
+)
+test('Info',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.168.2.7/24',
+		files('info-192.168.2.7')
+	]
+)

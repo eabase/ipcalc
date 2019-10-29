@@ -1523,7 +1523,7 @@ int main(int argc, char **argv)
 			printf("\n");
 			if (info.type)
 				dist_printf("Address space:\t", "%s\n", info.type);
-			if (info.class)
+			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
 				dist_printf("Address class:\t", "%s\n", info.class);
 
 			if (info.hostmin)
@@ -1539,7 +1539,7 @@ int main(int argc, char **argv)
 		} else {
 			if (info.type)
 				dist_printf("Address space:\t", "%s\n", info.type);
-			if (info.class)
+			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
 				dist_printf("Address class:\t", "%s\n", info.class);
 
 		}
