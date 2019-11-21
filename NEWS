@@ -9,6 +9,7 @@
 - Updated the IANA IPv6 Special-Purpose Address Registry support to
   2019-09-13, which adds a few new IPv6 address blocks that can now be
   detected by ipcalc.
+- Added the -j/--json output mode to print the info using the JSON format.
 
 
 * Version 0.2.5 (released 2019-02-18)
