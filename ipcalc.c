@@ -41,6 +41,7 @@
 
 int beSilent = 0;
 static unsigned colors = 0;
+static unsigned flags = 0;
 
 /*!
   \file ipcalc.c
@@ -1122,6 +1123,7 @@ static const struct option long_options[] = {
 	{"addrspace", 0, 0, OPT_ADDRSPACE},
 	{"silent", 0, 0, 's'},
 	{"no-decorate", 0, 0, OPT_NO_DECORATE},
+	{"json", 0, 0, 'j'},
 	{"version", 0, 0, 'v'},
 	{"help", 0, 0, '?'},
 	{"usage", 0, 0, OPT_USAGE},
@@ -1168,6 +1170,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "      --class-prefix              When specified the default prefix will be determined\n");
 		fprintf(stderr, "                                  by the IPv4 address class\n");
 		fprintf(stderr, "      --no-decorate               Print only the requested information\n");
+		fprintf(stderr, "  -j, --json                      JSON output\n");
 		fprintf(stderr, "  -s, --silent                    Don't ever display error messages\n");
 		fprintf(stderr, "  -v, --version                   Display program version\n");
 		fprintf(stderr, "  -?, --help                      Show this help message\n");
@@ -1177,7 +1180,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "        [--all-info] [-4|--ipv4] [-6|--ipv6] [-a|--address] [-b|--broadcast]\n");
 		fprintf(stderr, "        [-h|--hostname] [-o|--lookup-host=STRING] [-g|--geoinfo]\n");
 		fprintf(stderr, "        [-m|--netmask] [-n|--network] [-p|--prefix] [--minaddr] [--maxaddr]\n");
-		fprintf(stderr, "        [--addresses] [--addrspace] [-s|--silent] [-v|--version]\n");
+		fprintf(stderr, "        [--addresses] [--addrspace] [-j|--json] [-s|--silent] [-v|--version]\n");
 		fprintf(stderr, "        [--reverse-dns] [--class-prefix]\n");
 		fprintf(stderr, "        [-?|--help] [--usage]\n");
 	}
@@ -1188,24 +1191,103 @@ __attribute__ ((format(printf, 3, 4)))
 color_printf(const char *color, const char *title, const char *fmt, ...)
 {
 	va_list args;
+
+	va_start(args, fmt);
+	va_color_printf(color, title, fmt, args);
+	va_end(args);
+
+	return;
+}
+
+void va_color_printf(const char *color, const char *title, const char *fmt, va_list varglist)
+{
 	int ret;
 	char *str = NULL;
 
+	ret = vasprintf(&str, fmt, varglist);
+
+	if (ret < 0) {
+		return;
+	}
+
+	fputs(title, stdout);
+	if (colors) {
+		fputs(color, stdout);
+	}
+	fputs(str, stdout);
+	fputs("\n", stdout);
+	if (colors) {
+		fputs(KRESET, stdout);
+	}
+	free(str);
+	return;
+}
+
+void
+__attribute__ ((format(printf, 3, 4)))
+json_printf(unsigned * const jsonfirst, const char *jsontitle, const char *fmt, ...)
+{
+	va_list args;
+
 	va_start(args, fmt);
-	ret = vasprintf(&str, fmt, args);
+	va_json_printf(jsonfirst, jsontitle, fmt, args);
 	va_end(args);
 
+	return;
+}
+void va_json_printf(unsigned * const jsonfirst, const char *jsontitle, const char *fmt, va_list varglist)
+{
+	int ret;
+	char *str = NULL;
+
+	ret = vasprintf(&str, fmt, varglist);
 	if (ret < 0)
 		return;
 
-	fputs(title, stdout);
-	if (colors)
-		fputs(color, stdout);
+	if (*jsonfirst != JSON_FIRST) {
+		fprintf(stdout, ",\n");
+	}
+	fprintf(stdout, "  ");
+	fprintf(stdout, "\"%s\":\"%s\"", jsontitle, str);
+	*jsonfirst = JSON_NEXT;
 
-	fputs(str, stdout);
-	if (colors)
-		fputs(KRESET, stdout);
 	free(str);
+	return;
+}
+
+void
+__attribute__ ((format(printf, 4, 5)))
+default_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	if (flags & FLAG_JSON) {
+		va_json_printf(jsonfirst, jsontitle, fmt, args);
+	}
+	else {
+		va_color_printf(KBLUE, title, fmt, args);
+	}
+	va_end(args);
+
+	return;
+}
+
+void
+__attribute__ ((format(printf, 4, 5)))
+dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	if (flags & FLAG_JSON) {
+		va_json_printf(jsonfirst, jsontitle, fmt, args);
+	}
+	else {
+		va_color_printf(KMAG, title, fmt, args);
+	}
+	va_end(args);
+
 	return;
 }
 
@@ -1229,12 +1311,12 @@ int main(int argc, char **argv)
 	char *ipStr = NULL, *prefixStr = NULL, *netmaskStr = NULL, *chptr = NULL;
 	int prefix = -1, splitPrefix = -1;
 	ip_info_st info;
-	unsigned flags = 0;
 	int r = 0;
 	int c;
+	unsigned jsonchain = JSON_FIRST;
 
 	while (1) {
-		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpsv", long_options, NULL);
+		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsv", long_options, NULL);
 		if (c == -1)
 			break;
 
@@ -1308,6 +1390,9 @@ int main(int argc, char **argv)
 				break;
 			case OPT_NO_DECORATE:
 				flags |= FLAG_NO_DECORATE;
+				break;
+			case 'j':
+				flags |= FLAG_JSON;
 				break;
 			case 's':
 				beSilent = 1;
@@ -1495,65 +1580,92 @@ int main(int argc, char **argv)
 			single_host = 1;
 		}
 
+		if (flags & FLAG_JSON) {
+			printf("{\n");
+		}
+
 		if ((!randomStr || single_host) &&
 		    (single_host || strcmp(info.network, info.ip) != 0)) {
-			if (info.expanded_ip)
-				default_printf("Full Address:\t", "%s\n", info.expanded_ip);
-			default_printf("Address:\t", "%s\n", info.ip);
+			if (info.expanded_ip) {
+				default_printf(&jsonchain,"Full Address:\t", "FULLADDRESS", "%s", info.expanded_ip);
+			}
+			default_printf(&jsonchain, "Address:\t", "ADDRESS", "%s", info.ip);
 		}
 
 		if (!single_host) {
-			if (info.expanded_network) {
-				default_printf("Full Network:\t", "%s/%u\n", info.expanded_network, info.prefix);
+			if (! (flags & FLAG_JSON)) {
+				if (info.expanded_network) {
+					default_printf(&jsonchain, "Full Network:\t", "FULLNETWORK", "%s/%u", info.expanded_network, info.prefix);
+				}
+				default_printf(&jsonchain, "Network:\t", "NETWORK", "%s/%u", info.network, info.prefix);
+				default_printf(&jsonchain, "Netmask:\t", "NETMASK", "%s = %u", info.netmask, info.prefix);
 			}
-
-			default_printf("Network:\t", "%s/%u\n", info.network, info.prefix);
-
-			default_printf("Netmask:\t", "%s = %u\n", info.netmask, info.prefix);
+			else {
+				if (info.expanded_network) {
+					default_printf(&jsonchain, "Full Network:\t", "FULLNETWORK", "%s", info.expanded_network);
+				}
+				default_printf(&jsonchain, "Network:\t", "NETWORK", "%s", info.network);
+				default_printf(&jsonchain, "Netmask:\t", "NETMASK", "%s", info.netmask);
+				default_printf(&jsonchain, "Prefix:\t", "PREFIX", "%u", info.prefix);
+			}
 
 
 			if (info.broadcast)
-				default_printf("Broadcast:\t", "%s\n", info.broadcast);
+				default_printf(&jsonchain, "Broadcast:\t", "BROADCAST", "%s", info.broadcast);
 		}
 
 		if (((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO) && info.reverse_dns)
-			default_printf("Reverse DNS:\t", "%s\n", info.reverse_dns);
+			default_printf(&jsonchain, "Reverse DNS:\t", "REVERSEDNS", "%s", info.reverse_dns);
 
 		if (!single_host) {
-			printf("\n");
+			if (! (flags & FLAG_JSON)) {
+				printf("\n");
+			}
 			if (info.type)
-				dist_printf("Address space:\t", "%s\n", info.type);
+				dist_printf(&jsonchain, "Address space:\t", "ADDRSPACE", "%s", info.type);
+
 			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
-				dist_printf("Address class:\t", "%s\n", info.class);
+				dist_printf(&jsonchain, "Address class:\t", "ADDRCLASS", "%s", info.class);
 
 			if (info.hostmin)
-				default_printf("HostMin:\t", "%s\n", info.hostmin);
+				default_printf(&jsonchain, "HostMin:\t", "MINADDR", "%s", info.hostmin);
 
 			if (info.hostmax)
-				default_printf("HostMax:\t", "%s\n", info.hostmax);
+				default_printf(&jsonchain, "HostMax:\t", "MAXADDR", "%s", info.hostmax);
 
-			if (familyIPv6 && info.prefix < 112)
-				default_printf("Hosts/Net:\t", "2^(%u) = %s\n", 128-info.prefix, info.hosts);
-			else
-				default_printf("Hosts/Net:\t", "%s\n", info.hosts);
+			if (! (flags & FLAG_JSON)) {
+				if (familyIPv6 && info.prefix < 112)
+					default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "2^(%u) = %s", 128-info.prefix, info.hosts);
+				else
+					default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", info.hosts);
+			}
+			else {
+				default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", info.hosts);
+			}
 		} else {
 			if (info.type)
-				dist_printf("Address space:\t", "%s\n", info.type);
-			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
-				dist_printf("Address class:\t", "%s\n", info.class);
+				dist_printf(&jsonchain, "Address space:\t", "ADDRSPACE", "%s", info.type);
 
+			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
+				dist_printf(&jsonchain, "Address class:\t", "ADDRCLASS", "%s", info.class);
 		}
 
 		if (info.geoip_country || info.geoip_city || info.geoip_coord) {
-			printf("\n");
+			if (! (flags & FLAG_JSON)) {
+				printf("\n");
+			}
 			if (info.geoip_ccode)
-				dist_printf("Country code:\t", "%s\n", info.geoip_ccode);
+				dist_printf(&jsonchain, "Country code:\t", "COUNTRYCODE", "%s", info.geoip_ccode);
 			if (info.geoip_country)
-				dist_printf("Country:\t", "%s\n", info.geoip_country);
+				dist_printf(&jsonchain, "Country:\t", "COUNTRY", "%s", info.geoip_country);
 			if (info.geoip_city)
-				dist_printf("City:\t\t", "%s\n", info.geoip_city);
+				dist_printf(&jsonchain, "City:\t\t", "CITY", "%s", info.geoip_city);
 			if (info.geoip_coord)
-				dist_printf("Coordinates:\t", "%s\n", info.geoip_coord);
+				dist_printf(&jsonchain, "Coordinates:\t", "COORDINATES", "%s", info.geoip_coord);
+		}
+
+		if (flags & FLAG_JSON) {
+			printf("\n}\n");
 		}
 
 	} else if (!(flags & FLAG_SHOW_INFO)) {

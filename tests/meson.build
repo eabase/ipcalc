@@ -770,6 +770,62 @@ test('SpecificInfoOutputNoDecorate',
 		files('192.168.2.7')
 	]
 )
+test('JsonSplitPrefix24',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -S 24 10.10.10.0/16',
+		files('json-split-10.10.10.0-16-24')
+	]
+)
+test('JsonSplitPrefix26',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -S 26 192.168.5.45/24',
+		files('json-split-192.168.5.45-24-26')
+	]
+)
+test('JsonNoDecorateSplitPrefix24',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j --no-decorate -S 24 10.10.10.0/16',
+		files('json-nsplit-10.10.10.0-16-24')
+	]
+)
+test('JsonNoDecorateSplitPrefix26',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j --no-decorate -S 26 192.168.5.45/24',
+		files('json-nsplit-192.168.5.45-24-26')
+	]
+)
+test('JsonSplitPrefix64',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -S 64 2a03:2880:20:4f06:face::/56',
+		files('json-nsplit-2a03:2880:20:4f06:face::-56-64')
+	]
+)
+test('JsonNoDecorateSplitPrefix64',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j --no-decorate -S 64 2a03:2880:20:4f06:face::/56',
+		files('json-nsplit-2a03:2880:20:4f06:face::-56-64')
+	]
+)
+test('JsonTestHumanReadableGenericInfoPrefix56',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -i 2a03:2880:20:4f06:face:b00c:0:1/56',
+		files('json-i-2a03:2880:20:4f06:face:b00c:0:1-56')
+	]
+)
 test('AllInfo',
 	testrunner,
 	args : [

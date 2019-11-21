@@ -46,7 +46,7 @@ char *calc_reverse_dns4(struct in_addr ip, unsigned prefix, struct in_addr net, 
 char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix);
 
 uint32_t prefix2mask(int prefix);
-int ipv6_prefix_to_mask(unsigned prefix, struct in6_addr *mask); 
+int ipv6_prefix_to_mask(unsigned prefix, struct in6_addr *mask);
 
 char *ipv4_prefix_to_hosts(char *hosts, unsigned hosts_size, unsigned prefix);
 char *ipv6_prefix_to_hosts(char *hosts, unsigned hosts_size, unsigned prefix);
@@ -94,6 +94,7 @@ typedef struct ip_info_st {
 #define FLAG_SPLIT (1<<19)
 #define FLAG_NO_DECORATE (1<<20)
 #define FLAG_SHOW_ADDRESS (1<<21)
+#define FLAG_JSON (1<<22)
 
 /* Flags that are not real options */
 #define FLAGS_TO_IGNORE (FLAG_GET_GEOIP|FLAG_SPLIT|FLAG_NO_DECORATE|FLAG_ASSUME_CLASS_PREFIX|(1<<16))
@@ -106,12 +107,24 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 #define KMAG   "\x1B[35m"
 #define KRESET "\033[0m"
 
-#define default_printf(...) color_printf(KBLUE, __VA_ARGS__)
-#define dist_printf(...) color_printf(KMAG, __VA_ARGS__)
+#define JSON_FIRST 0
+#define JSON_NEXT  1
 
 void
 __attribute__ ((format(printf, 3, 4)))
 color_printf(const char *color, const char *title, const char *fmt, ...);
+void
+__attribute__ ((format(printf, 3, 4)))
+json_printf(unsigned * const jsonfirst, const char *jsontitle, const char *fmt, ...);
+void va_color_printf(const char *color, const char *title, const char *fmt, va_list varglist);
+void va_json_printf(unsigned  * const jsonfirst, const char *jsontitle, const char *fmt, va_list varglist);
+
+void
+__attribute__ ((format(printf, 4, 5)))
+default_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...);
+void
+__attribute__ ((format(printf, 4, 5)))
+dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...);
 
 extern int beSilent;
 
