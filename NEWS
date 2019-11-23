@@ -1,4 +1,4 @@
-* Version 0.2.6 (unreleased)
+* Version 0.3.0 (unreleased)
 - Added Meson build system
 - Extend --no-decorate support to work with the specific info output options.
 - Added the -a/--address info output option to explicitly print the address.

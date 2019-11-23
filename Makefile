@@ -6,7 +6,7 @@ LIBPATH?=/usr/lib64
 #LIBPATH=/usr/lib/x86_64-linux-gnu
 
 LIBS?=
-VERSION=0.2.6
+VERSION=$(shell cat meson.build|grep 'version :'|cut -d ':' -f 2|tr -d " \'")
 CC?=gcc
 CFLAGS?=-O2 -g -Wall
 LDFLAGS=$(LIBS)
