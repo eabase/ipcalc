@@ -1,5 +1,8 @@
-* Version 0.3.0 (unreleased)
-- Added Meson build system
+* Version 0.3.0 (released 2019-11-23)
+- Added Meson build system; to build use:
+   $ meson setup build
+   $ ninja -C build
+   $ ninja -C build test
 - Extend --no-decorate support to work with the specific info output options.
 - Added the -a/--address info output option to explicitly print the address.
 - Do not display the address class information unless --all-info is given
