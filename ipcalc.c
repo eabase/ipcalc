@@ -1291,6 +1291,26 @@ dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle
 	return;
 }
 
+/* Printed variables names */
+#define HOSTNAME_NAME "HOSTNAME"
+#define FULL_ADDRESS_NAME "FULLADDRESS"
+#define ADDRESS_NAME "ADDRESS"
+#define FULL_NETWORK_NAME "FULLNETWORK"
+#define NETWORK_NAME "NETWORK"
+#define NETMASK_NAME "NETMASK"
+#define PREFIX_NAME "PREFIX"
+#define BROADCAST_NAME "BROADCAST"
+#define REVERSEDNS_NAME "REVERSEDNS"
+#define ADDRSPACE_NAME "ADDRSPACE"
+#define ADDRCLASS_NAME "ADDRCLASS"
+#define MINADDR_NAME "MINADDR"
+#define MAXADDR_NAME "MAXADDR"
+#define ADDRESSES_NAME "ADDRESSES"
+#define COUNTRYCODE_NAME "COUNTRYCODE"
+#define COUNTRY_NAME "COUNTRY"
+#define CITY_NAME "CITY"
+#define COORDINATES_NAME "COORDINATES"
+
 /*!
   \fn main(int argc, const char **argv)
   \brief wrapper program for ipcalc functions.
@@ -1587,67 +1607,63 @@ int main(int argc, char **argv)
 		if ((!randomStr || single_host) &&
 		    (single_host || strcmp(info.network, info.ip) != 0)) {
 			if (info.expanded_ip) {
-				default_printf(&jsonchain,"Full Address:\t", "FULLADDRESS", "%s", info.expanded_ip);
+				default_printf(&jsonchain,"Full Address:\t", FULL_ADDRESS_NAME, "%s", info.expanded_ip);
 			}
-			default_printf(&jsonchain, "Address:\t", "ADDRESS", "%s", info.ip);
+			default_printf(&jsonchain, "Address:\t", ADDRESS_NAME, "%s", info.ip);
 		}
 
 		if (!single_host) {
 			if (! (flags & FLAG_JSON)) {
 				if (info.expanded_network) {
-					default_printf(&jsonchain, "Full Network:\t", "FULLNETWORK", "%s/%u", info.expanded_network, info.prefix);
+					default_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s/%u", info.expanded_network, info.prefix);
 				}
-				default_printf(&jsonchain, "Network:\t", "NETWORK", "%s/%u", info.network, info.prefix);
-				default_printf(&jsonchain, "Netmask:\t", "NETMASK", "%s = %u", info.netmask, info.prefix);
+				default_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s/%u", info.network, info.prefix);
+				default_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s = %u", info.netmask, info.prefix);
 			}
 			else {
 				if (info.expanded_network) {
-					default_printf(&jsonchain, "Full Network:\t", "FULLNETWORK", "%s", info.expanded_network);
+					default_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s", info.expanded_network);
 				}
-				default_printf(&jsonchain, "Network:\t", "NETWORK", "%s", info.network);
-				default_printf(&jsonchain, "Netmask:\t", "NETMASK", "%s", info.netmask);
-				default_printf(&jsonchain, "Prefix:\t", "PREFIX", "%u", info.prefix);
+				default_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s", info.network);
+				default_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s", info.netmask);
+				default_printf(&jsonchain, "Prefix:\t", PREFIX_NAME, "%u", info.prefix);
 			}
 
 
 			if (info.broadcast)
-				default_printf(&jsonchain, "Broadcast:\t", "BROADCAST", "%s", info.broadcast);
+				default_printf(&jsonchain, "Broadcast:\t", BROADCAST_NAME, "%s", info.broadcast);
 		}
 
 		if (((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO) && info.reverse_dns)
-			default_printf(&jsonchain, "Reverse DNS:\t", "REVERSEDNS", "%s", info.reverse_dns);
+			default_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
 
 		if (!single_host) {
 			if (! (flags & FLAG_JSON)) {
 				printf("\n");
 			}
 			if (info.type)
-				dist_printf(&jsonchain, "Address space:\t", "ADDRSPACE", "%s", info.type);
+				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
 			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
-				dist_printf(&jsonchain, "Address class:\t", "ADDRCLASS", "%s", info.class);
+				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 
 			if (info.hostmin)
-				default_printf(&jsonchain, "HostMin:\t", "MINADDR", "%s", info.hostmin);
+				default_printf(&jsonchain, "HostMin:\t", MINADDR_NAME, "%s", info.hostmin);
 
 			if (info.hostmax)
-				default_printf(&jsonchain, "HostMax:\t", "MAXADDR", "%s", info.hostmax);
+				default_printf(&jsonchain, "HostMax:\t", MAXADDR_NAME, "%s", info.hostmax);
 
-			if (! (flags & FLAG_JSON)) {
-				if (familyIPv6 && info.prefix < 112)
-					default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "2^(%u) = %s", 128-info.prefix, info.hosts);
-				else
-					default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", info.hosts);
-			}
-			else {
-				default_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", info.hosts);
-			}
+			if (familyIPv6 && info.prefix < 112 && !(flags & FLAG_JSON))
+				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "2^(%u) = %s", 128-info.prefix, info.hosts);
+			else
+				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
+
 		} else {
 			if (info.type)
-				dist_printf(&jsonchain, "Address space:\t", "ADDRSPACE", "%s", info.type);
+				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
 			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
-				dist_printf(&jsonchain, "Address class:\t", "ADDRCLASS", "%s", info.class);
+				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 		}
 
 		if (info.geoip_country || info.geoip_city || info.geoip_coord) {
@@ -1655,13 +1671,13 @@ int main(int argc, char **argv)
 				printf("\n");
 			}
 			if (info.geoip_ccode)
-				dist_printf(&jsonchain, "Country code:\t", "COUNTRYCODE", "%s", info.geoip_ccode);
+				dist_printf(&jsonchain, "Country code:\t", COUNTRYCODE_NAME, "%s", info.geoip_ccode);
 			if (info.geoip_country)
-				dist_printf(&jsonchain, "Country:\t", "COUNTRY", "%s", info.geoip_country);
+				dist_printf(&jsonchain, "Country:\t", COUNTRY_NAME, "%s", info.geoip_country);
 			if (info.geoip_city)
-				dist_printf(&jsonchain, "City:\t\t", "CITY", "%s", info.geoip_city);
+				dist_printf(&jsonchain, "City:\t\t", CITY_NAME, "%s", info.geoip_city);
 			if (info.geoip_coord)
-				dist_printf(&jsonchain, "Coordinates:\t", "COORDINATES", "%s", info.geoip_coord);
+				dist_printf(&jsonchain, "Coordinates:\t", COORDINATES_NAME, "%s", info.geoip_coord);
 		}
 
 		if (flags & FLAG_JSON) {
@@ -1672,63 +1688,63 @@ int main(int argc, char **argv)
 
 		if (flags & FLAG_SHOW_ADDRESS) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("ADDRESS=");
+				printf(ADDRESS_NAME"=");
 			}
 			printf("%s\n", info.ip);
 		}
 
 		if (flags & FLAG_SHOW_NETMASK) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("NETMASK=");
+				printf(NETMASK_NAME"=");
 			}
 			printf("%s\n", info.netmask);
 		}
 
 		if (flags & FLAG_SHOW_PREFIX) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("PREFIX=");
+				printf(PREFIX_NAME"=");
 			}
 			printf("%u\n", info.prefix);
 		}
 
 		if ((flags & FLAG_SHOW_BROADCAST) && !familyIPv6) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("BROADCAST=");
+				printf(BROADCAST_NAME"=");
 			}
 			printf("%s\n", info.broadcast);
 		}
 
 		if (flags & FLAG_SHOW_NETWORK) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("NETWORK=");
+				printf(NETWORK_NAME"=");
 			}
 			printf("%s\n", info.network);
 		}
 
 		if (flags & FLAG_SHOW_REVERSE) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("REVERSEDNS=");
+				printf(REVERSEDNS_NAME"=");
 			}
 			printf("%s\n", info.reverse_dns);
 		}
 
 		if ((flags & FLAG_SHOW_MINADDR) && info.hostmin) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("MINADDR=");
+				printf(MINADDR_NAME"=");
 			}
 			printf("%s\n", info.hostmin);
 		}
 
 		if ((flags & FLAG_SHOW_MAXADDR) && info.hostmax) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("MAXADDR=");
+				printf(MAXADDR_NAME"=");
 			}
 			printf("%s\n", info.hostmax);
 		}
 
 		if ((flags & FLAG_SHOW_ADDRSPACE) && info.type) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("ADDRSPACE=");
+				printf(ADDRSPACE_NAME"=");
 			}
 			if (strchr(info.type, ' ') != NULL)
 				printf("\"%s\"\n", info.type);
@@ -1738,7 +1754,7 @@ int main(int argc, char **argv)
 
 		if ((flags & FLAG_SHOW_ADDRESSES) && info.hosts[0]) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("ADDRESSES=");
+				printf(ADDRESSES_NAME"=");
 			}
 			if (strchr(info.hosts, ' ') != NULL)
 				printf("\"%s\"\n", info.hosts);
@@ -1748,14 +1764,14 @@ int main(int argc, char **argv)
 
 		if ((flags & FLAG_RESOLVE_HOST) && info.hostname) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("HOSTNAME=");
+				printf(HOSTNAME_NAME"=");
 			}
 			printf("%s\n", info.hostname);
 		}
 
 		if (flags & FLAG_RESOLVE_IP) {
 			if (! (flags & FLAG_NO_DECORATE)) {
-				printf("ADDRESS=");
+				printf(ADDRESS_NAME"=");
 			}
 			printf("%s\n", ipStr);
 		}
@@ -1763,13 +1779,13 @@ int main(int argc, char **argv)
 		if ((flags & FLAG_SHOW_GEOIP) == FLAG_SHOW_GEOIP) {
 			if (info.geoip_ccode) {
 				if (! (flags & FLAG_NO_DECORATE)) {
-					printf("COUNTRYCODE=");
+					printf(COUNTRYCODE_NAME"=");
 				}
 				printf("%s\n", info.geoip_ccode);
 			}
 			if (info.geoip_country) {
 				if (! (flags & FLAG_NO_DECORATE)) {
-					printf("COUNTRY=");
+					printf(COUNTRY_NAME"=");
 				}
 				if (strchr(info.geoip_country, ' ') != NULL)
 					printf("\"%s\"\n", info.geoip_country);
@@ -1778,7 +1794,7 @@ int main(int argc, char **argv)
 			}
 			if (info.geoip_city) {
 				if (! (flags & FLAG_NO_DECORATE)) {
-					printf("CITY=");
+					printf(CITY_NAME"=");
 				}
 				if (strchr(info.geoip_city, ' ') != NULL) {
 					printf("\"%s\"\n", info.geoip_city);
@@ -1788,7 +1804,7 @@ int main(int argc, char **argv)
 			}
 			if (info.geoip_coord) {
 				if (! (flags & FLAG_NO_DECORATE)) {
-					printf("COORDINATES=");
+					printf(COORDINATES_NAME"=");
 				}
 				printf("\"%s\"\n", info.geoip_coord);
 			}
