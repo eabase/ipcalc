@@ -101,7 +101,7 @@ $ make USE_GEOIP=no USE_MAXMIND=no
 ## IPv4
 
 ```
-$ ./ipcalc --all-info 193.92.150.2/24
+$ ipcalc --all-info 193.92.150.2/24
 Address:        193.92.150.2
 Network:        193.92.150.0/24
 Netmask:        255.255.255.0 = 24
@@ -119,7 +119,7 @@ Country:        Greece
 ```
 
 ```
-$ ./ipcalc -pnmb --minaddr --maxaddr --geoinfo --addrspace 193.92.150.2/255.255.255.224
+$ ipcalc -pnmb --minaddr --maxaddr --geoinfo --addrspace 193.92.150.2/255.255.255.224
 NETMASK=255.255.255.224
 PREFIX=27
 BROADCAST=193.92.150.31
@@ -133,7 +133,7 @@ COUNTRY="Greece"
 ## IPv6
 
 ```
-$ ./ipcalc --all-info 2a03:2880:20:4f06:face:b00c:0:14/64
+$ ipcalc --all-info 2a03:2880:20:4f06:face:b00c:0:14/64
 Full Address:   2a03:2880:0020:4f06:face:b00c:0000:0014
 Address:        2a03:2880:20:4f06:face:b00c:0:14
 Full Network:   2a03:2880:0020:4f06:0000:0000:0000:0000/64
@@ -151,7 +151,7 @@ Country:        Ireland
 ```
 
 ```
-$ ./ipcalc -pnmb --minaddr --maxaddr --addrspace --geoinfo 2a03:2880:20:4f06:face:b00c:0:14/64
+$ ipcalc -pnmb --minaddr --maxaddr --addrspace --geoinfo 2a03:2880:20:4f06:face:b00c:0:14/64
 NETMASK=ffff:ffff:ffff:ffff::
 PREFIX=64
 NETWORK=2a03:2880:20:4f06::
@@ -161,3 +161,24 @@ ADDRSPACE="Global Unicast"
 COUNTRY="Ireland"
 ```
 
+## JSON output
+
+```
+$ ipcalc --all-info -j 2a03:2880:20:4f06:face:b00c:0:14/64
+{
+  "FULLADDRESS":"2a03:2880:0020:4f06:face:b00c:0000:0014",
+  "ADDRESS":"2a03:2880:20:4f06:face:b00c:0:14",
+  "FULLNETWORK":"2a03:2880:0020:4f06:0000:0000:0000:0000",
+  "NETWORK":"2a03:2880:20:4f06::",
+  "NETMASK":"ffff:ffff:ffff:ffff::",
+  "PREFIX":"64",
+  "REVERSEDNS":"6.0.f.4.0.2.0.0.0.8.8.2.3.0.a.2.ip6.arpa.",
+  "ADDRSPACE":"Global Unicast",
+  "MINADDR":"2a03:2880:20:4f06::",
+  "MAXADDR":"2a03:2880:20:4f06:ffff:ffff:ffff:ffff",
+  "ADDRESSES":"18446744073709551616",
+  "COUNTRYCODE":"IE",
+  "COUNTRY":"Ireland",
+  "COORDINATES":"53.000000,-8.000000"
+}
+```
