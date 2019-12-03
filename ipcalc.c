@@ -147,7 +147,13 @@ static struct in_addr calc_broadcast(struct in_addr addr, int prefix)
 	mask.s_addr = prefix2mask(prefix);
 
 	memset(&broadcast, 0, sizeof(broadcast));
-	broadcast.s_addr = (addr.s_addr & mask.s_addr) | ~mask.s_addr;
+
+	/* Follow RFC3021 and set the limited broadcast address on /31 */
+	if (prefix == 31)
+		broadcast.s_addr = htonl(0xFFFFFFFF);
+	else
+		broadcast.s_addr = (addr.s_addr & mask.s_addr) | ~mask.s_addr;
+
 	return broadcast;
 }
 
