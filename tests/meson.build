@@ -1,5 +1,41 @@
 testrunner = find_program('ipcalc-testrunner.sh')
 
+# Incompatible combinations test
+test('Split-Info',
+	testrunner,
+	args : [
+		'--test-failure',
+		ipcalc.full_path() + ' -abmnp -S 26 10.100.1.0/24'
+	]
+)
+test('Check-Info',
+	testrunner,
+	args : [
+		'--test-failure',
+		ipcalc.full_path() + ' -c -abmnp 10.100.1.1'
+	]
+)
+test('Check-Split',
+	testrunner,
+	args : [
+		'--test-failure',
+		ipcalc.full_path() + ' -c -S 26 10.100.1.0/24'
+	]
+)
+test('Check-Host',
+	testrunner,
+	args : [
+		'--test-failure',
+		ipcalc.full_path() + ' -c -h 127.0.0.1'
+	]
+)
+test('Random-Info',
+	testrunner,
+	args : [
+		'--test-failure',
+		ipcalc.full_path() + ' -r 24 -i 127.0.0.1'
+	]
+)
 # --class-prefix tests
 test('AssignClassPrefix12',
 	testrunner,

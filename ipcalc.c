@@ -258,17 +258,10 @@ static char *get_ip_address(int family, const char *host)
 static int bit_count(uint32_t i)
 {
 	int c = 0;
-	unsigned int seen_one = 0;
 
 	while (i > 0) {
-		if (i & 1) {
-			seen_one = 1;
+		if (i & 1)
 			c++;
-		} else {
-			if (seen_one) {
-				return -1;
-			}
-		}
 		i >>= 1;
 	}
 
@@ -286,7 +279,23 @@ static int bit_count(uint32_t i)
   \return the number of significant bits.  */
 static int mask2prefix(struct in_addr mask)
 {
-	return bit_count(ntohl(mask.s_addr));
+	int c = 0;
+	unsigned int seen_one = 0;
+	uint32_t i = ntohl(mask.s_addr);
+
+	while (i > 0) {
+		if (i & 1) {
+			seen_one = 1;
+			c++;
+		} else {
+			if (seen_one) {
+				return -1;
+			}
+		}
+		i >>= 1;
+	}
+
+	return c;
 }
 
 static
@@ -1414,6 +1423,7 @@ int main(int argc, char **argv)
 				if (splitStr == NULL) exit(1);
 				break;
 			case 'r':
+				flags |= FLAG_RANDOM;
 				randomStr = safe_strdup(optarg);
 				if (randomStr == NULL) exit(1);
 				break;
@@ -1521,6 +1531,13 @@ int main(int argc, char **argv)
 	if (geo_setup() == 0 &&
         ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO))
 		flags |= FLAG_GET_GEOIP;
+
+	if (bit_count((flags & FLAGS_TO_IGNORE_MASK) & FLAGS_MULTI_MASK) > 1) {
+		if (!beSilent)
+			fprintf(stderr,
+				"ipcalc: you cannot mix these options\n");
+		return 1;
+	}
 
 	if ((hostname && randomStr) || (hostname && splitStr) || (randomStr && splitStr)) {
 		if (!beSilent)
