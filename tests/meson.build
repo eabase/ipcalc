@@ -970,3 +970,94 @@ test('InfoImplicit',
 		files('info-192.168.2.7')
 	]
 )
+test('DeaggregateNoDecorate',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' --no-decorate -d 192.168.2.7-192.168.2.13',
+		files('deaggregate-192.168.2.7-192.168.2.13')
+	]
+)
+test('Deaggregate',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -d 192.168.2.0-192.168.3.255',
+		files('deaggregate-192.168.2.0-192.168.3.255')
+	]
+)
+test('DeaggregateSpaces',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -d "  192.168.2.0   - 192.168.3.255   "',
+		files('deaggregate-192.168.2.0-192.168.3.255')
+	]
+)
+test('DeaggregateJson',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -d 192.168.2.33-192.168.3.2',
+		files('deaggregate-192.168.2.33-192.168.3.2')
+	]
+)
+test('DeaggregateIPv6NoDecorate',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' --no-decorate -d 2a03:2880:20:4f06:face::0-2a03:2880:20:4f06:face::fffe',
+		files('deaggregate-2a03:2880:20:4f06:face::0-2a03:2880:20:4f06:face::fffe')
+	]
+)
+test('DeaggregateIPv6',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -d fcd3:57d1:733:c18f:b498:25e1:788:0-fcd3:57d1:733:c18f:b498:25e1:788:ffff',
+		files('deaggregate-fcd3:57d1:733:c18f:b498:25e1:788:0-fcd3:57d1:733:c18f:b498:25e1:788:ffff')
+	]
+)
+test('DeaggregateIPv6Json',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -d fcd3:57d1:733:c18f:b498:25e1:788:f-fcd3:57d1:733:c18f:b498:25e1:789:ffa9',
+		files('deaggregate-fcd3:57d1:733:c18f:b498:25e1:788:f-fcd3:57d1:733:c18f:b498:25e1:789:ffa9')
+	]
+)
+# Test whether we can deaggregate a randomly generated network
+test('DeaggregateIPv6Random',
+	testrunner,
+	args : [
+		'--test-success-verbatim',
+		'eval ' + '$(' + ipcalc.full_path() + ' -r 96 --prefix -n --minaddr --maxaddr)' +
+		'; test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
+	]
+)
+test('DeaggregateSplitIPv6',
+	testrunner,
+	args : [
+		'--test-success-verbatim',
+		'eval ' + '$(' + ipcalc.full_path() + ' -r 56 --prefix -n);' +
+		'HEAD=$(' + ipcalc.full_path() + ' -S 64 ${NETWORK}/${PREFIX} --no-decorate|head -1;' +
+		'TAIL=$(' + ipcalc.full_path() + ' -S 64 ${NETWORK}/${PREFIX} --no-decorate|tail -1;' +	
+		'FIRST=$(' + ipcalc.full_path() + ' --no-decorate --minaddr ${HEAD});' +
+		'LAST=$(' + ipcalc.full_path() + ' --no-decorate --maxaddr ${TAIL});' +
+		'NEW=$(' + ipcalc.full_path() + ' --no-decorate -d "${FIRST} - ${LAST}");' +
+		'test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
+	]
+)
+test('DeaggregateSplitIPv4',
+	testrunner,
+	args : [
+		'--test-success-verbatim',
+		'eval ' + '$(' + ipcalc.full_path() + ' -r 24 --prefix -n);' +
+		'HEAD=$(' + ipcalc.full_path() + ' -S 26 ${NETWORK}/${PREFIX} --no-decorate|head -1;' +
+		'TAIL=$(' + ipcalc.full_path() + ' -S 26 ${NETWORK}/${PREFIX} --no-decorate|tail -1;' +	
+		'FIRST=$(' + ipcalc.full_path() + ' --no-decorate -n ${HEAD});' +
+		'LAST=$(' + ipcalc.full_path() + ' --no-decorate -b ${TAIL});' +
+		'NEW=$(' + ipcalc.full_path() + ' --no-decorate -d "${FIRST} - ${LAST}");' +
+		'test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
+	]
+)

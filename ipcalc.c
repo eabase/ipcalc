@@ -166,7 +166,7 @@ static struct in_addr calc_broadcast(struct in_addr addr, int prefix)
   \return the base address of the network that addr is associated with, in
   network byte order.
 */
-static struct in_addr calc_network(struct in_addr addr, int prefix)
+struct in_addr calc_network(struct in_addr addr, int prefix)
 {
 	struct in_addr mask;
 	struct in_addr network;
@@ -659,9 +659,9 @@ int get_ipv4_info(const char *ipStr, int prefix, ip_info_st * info,
 	memset(namebuf, '\0', sizeof(namebuf));
 
 	if (inet_ntop(AF_INET, &netmask, namebuf, INET_ADDRSTRLEN) == NULL) {
-		fprintf(stderr, "Memory allocation failure line %d\n",
+		fprintf(stderr, "inet_ntop failure at line %d\n",
 			__LINE__);
-		abort();
+		exit(1);
 	}
 	info->netmask = safe_strdup(namebuf);
 	info->prefix = prefix;
@@ -670,9 +670,9 @@ int get_ipv4_info(const char *ipStr, int prefix, ip_info_st * info,
 
 	memset(namebuf, '\0', sizeof(namebuf));
 	if (inet_ntop(AF_INET, &broadcast, namebuf, INET_ADDRSTRLEN) == NULL) {
-		fprintf(stderr, "Memory allocation failure line %d\n",
+		fprintf(stderr, "inet_ntop failure at line %d\n",
 			__LINE__);
-		abort();
+		exit(1);
 	}
 	info->broadcast = safe_strdup(namebuf);
 
@@ -682,9 +682,9 @@ int get_ipv4_info(const char *ipStr, int prefix, ip_info_st * info,
 
 	memset(namebuf, '\0', sizeof(namebuf));
 	if (inet_ntop(AF_INET, &network, namebuf, INET_ADDRSTRLEN) == NULL) {
-		fprintf(stderr, "Memory allocation failure line %d\n",
+		fprintf(stderr, "inet_ntop failure at line %d\n",
 			__LINE__);
-		abort();
+		exit(1);
 	}
 
 	info->network = safe_strdup(namebuf);
@@ -699,9 +699,9 @@ int get_ipv4_info(const char *ipStr, int prefix, ip_info_st * info,
 			minhost.s_addr = htonl(ntohl(minhost.s_addr) | 1);
 		if (inet_ntop(AF_INET, &minhost, namebuf, INET_ADDRSTRLEN) ==
 		    NULL) {
-			fprintf(stderr, "Memory allocation failure line %d\n",
+			fprintf(stderr, "inet_ntop failure at line %d\n",
 				__LINE__);
-			abort();
+			exit(1);
 		}
 		info->hostmin = safe_strdup(namebuf);
 
@@ -1029,7 +1029,7 @@ static int randomize(void *ptr, unsigned size)
 	return 0;
 }
 
-static char *generate_ip_network(int ipv6, unsigned prefix)
+static char *generate_ip_network(unsigned prefix, unsigned flags)
 {
 	struct timespec ts;
 	char ipbuf[64];
@@ -1038,7 +1038,7 @@ static char *generate_ip_network(int ipv6, unsigned prefix)
 	if (clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts) < 0)
 		return NULL;
 
-	if (ipv6) {
+	if (flags & FLAG_IPV6) {
 		struct in6_addr net;
 
 		net.s6_addr[0] = 0xfc;
@@ -1081,10 +1081,10 @@ static char *generate_ip_network(int ipv6, unsigned prefix)
 }
 
 static
-int str_to_prefix(int *ipv6, const char *prefixStr, unsigned fix)
+int str_to_prefix(unsigned *flags, const char *prefixStr, unsigned fix)
 {
 	int prefix = -1, r;
-	if (!(*ipv6) && strchr(prefixStr, '.')) {	/* prefix is 255.x.x.x */
+	if (!((*flags) & FLAG_IPV6) && strchr(prefixStr, '.')) {	/* prefix is 255.x.x.x */
 		prefix = ipv4_mask_to_int(prefixStr);
 	} else {
 		r = safe_atoi(prefixStr, &prefix);
@@ -1093,10 +1093,10 @@ int str_to_prefix(int *ipv6, const char *prefixStr, unsigned fix)
 		}
 	}
 
-	if (fix && (prefix > 32 && !(*ipv6)))
-		*ipv6 = 1;
+	if (fix && (prefix > 32 && !((*flags) & FLAG_IPV6)))
+		*flags |= FLAG_IPV6;
 
-	if (prefix < 0 || (((*ipv6) && prefix > 128) || (!(*ipv6) && prefix > 32))) {
+	if (prefix < 0 || ((((*flags) & FLAG_IPV6) && prefix > 128) || (!((*flags) & FLAG_IPV6) && prefix > 32))) {
 		return -1;
 	}
 	return prefix;
@@ -1116,6 +1116,7 @@ static const struct option long_options[] = {
 	{"check", 0, 0, 'c'},
 	{"random-private", 1, 0, 'r'},
 	{"split", 1, 0, 'S'},
+	{"deaggregate", 1, 0, 'd'},
 	{"info", 0, 0, 'i'},
 	{"all-info", 0, 0, OPT_ALLINFO},
 	{"ipv4", 0, 0, '4'},
@@ -1154,6 +1155,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "  -r, --random-private=PREFIX     Generate a random private IP network using\n");
 		fprintf(stderr, "  -S, --split=PREFIX              Split the provided network using the\n");
 		fprintf(stderr, "                                  provided prefix/netmask\n");
+		fprintf(stderr, "  -d, --deagrregate=RANGE         Deaggregate the provided address range\n");
 		fprintf(stderr, "  -i, --info                      Print information on the provided IP address\n");
 		fprintf(stderr, "                                  (default)\n");
 		fprintf(stderr, "      --all-info                  Print verbose information on the provided IP\n");
@@ -1395,7 +1397,6 @@ dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle
 */
 int main(int argc, char **argv)
 {
-	int familyIPv4 = 0, familyIPv6 = 0;
 	char *randomStr = NULL;
 	char *hostname = NULL;
 	char *splitStr = NULL;
@@ -1408,7 +1409,7 @@ int main(int argc, char **argv)
 	enum app_t app = 0;
 
 	while (1) {
-		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsv", long_options, NULL);
+		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsvd:", long_options, NULL);
 		if (c == -1)
 			break;
 
@@ -1420,6 +1421,11 @@ int main(int argc, char **argv)
 				app |= APP_SPLIT;
 				splitStr = safe_strdup(optarg);
 				if (splitStr == NULL) exit(1);
+				break;
+			case 'd':
+				app |= APP_DEAGGREGATE;
+				ipStr = safe_strdup(optarg);
+				if (ipStr == NULL) exit(1);
 				break;
 			case 'r':
 				app |= APP_SHOW_INFO;
@@ -1443,10 +1449,10 @@ int main(int argc, char **argv)
 				flags |= FLAG_SHOW_REVERSE;
 				break;
 			case '4':
-				familyIPv4 = 1;
+				flags |= FLAG_IPV4;
 				break;
 			case '6':
-				familyIPv6 = 1;
+				flags |= FLAG_IPV6;
 				break;
 			case 'a':
 				app |= APP_SHOW_INFO;
@@ -1520,6 +1526,13 @@ int main(int argc, char **argv)
 	}
 
 	if (optind < argc) {
+		if (ipStr != NULL) {
+			if (!beSilent)
+				fprintf(stderr,
+					"ipcalc: superfluous option given\n");
+			exit(1);
+		}
+
 		ipStr = argv[optind++];
 		if (optind < argc)
 			chptr = argv[optind++];
@@ -1546,7 +1559,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (familyIPv6 && familyIPv4) {
+	if ((flags & FLAG_IPV6) && (flags & FLAG_IPV4)) {
 		if (!beSilent)
 			fprintf(stderr,
 				"ipcalc: you cannot specify both IPv4 and IPv6\n");
@@ -1558,13 +1571,16 @@ int main(int argc, char **argv)
 	 * that the tool can be used to check for a valid IPv4 or IPv6
 	 * address.
 	 */
-	if (familyIPv4 == 0 && ipStr && strchr(ipStr, ':') != NULL) {
-		familyIPv6 = 1;
+	if ((flags & FLAG_IPV4) == 0 && ipStr && strchr(ipStr, ':') != NULL) {
+		flags |= FLAG_IPV6;
 	}
 
 	switch (app) {
 	case APP_VERSION:
 		printf("ipcalc %s\n", VERSION);
+		return 0;
+	case APP_DEAGGREGATE:
+		deaggregate(ipStr, flags);
 		return 0;
 	case APP_SPLIT:
 	case APP_CHECK_ADDRESS:
@@ -1583,15 +1599,15 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		prefix = str_to_prefix(&familyIPv6, randomStr, 1);
+		prefix = str_to_prefix(&flags, randomStr, 1);
 		if (prefix < 0) {
 			if (!beSilent)
 				fprintf(stderr,
-					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", randomStr);
+					"ipcalc: bad %s prefix: %s\n", (flags&FLAG_IPV6)?"IPv6":"IPv4", randomStr);
 			return 1;
 		}
 
-		ipStr = generate_ip_network(familyIPv6, prefix);
+		ipStr = generate_ip_network(prefix, flags);
 		if (ipStr == NULL) {
 			if (!beSilent)
 				fprintf(stderr,
@@ -1613,9 +1629,9 @@ int main(int argc, char **argv)
 	/* resolve IP address if a hostname was given */
 	if (hostname) {
 		int family = AF_UNSPEC;
-		if (familyIPv6)
+		if (flags & FLAG_IPV6)
 			family = AF_INET6;
-		else if (familyIPv4)
+		else if (flags & FLAG_IPV4)
 			family = AF_INET;
 
 		ipStr = get_ip_address(family, hostname);
@@ -1626,13 +1642,13 @@ int main(int argc, char **argv)
 			return 1;
 		}
 
-		if (familyIPv4 == 0 && strchr(ipStr, ':') != NULL) {
-			familyIPv6 = 1;
+		if ((flags & FLAG_IPV4) == 0 && strchr(ipStr, ':') != NULL) {
+			flags |= FLAG_IPV6;
 		}
 	}
 
 	if (chptr) {
-		if (familyIPv6 == 0) {
+		if ((flags & FLAG_IPV6) == 0) {
 			prefixStr = chptr;
 		} else {
 			if (!beSilent) {
@@ -1651,16 +1667,16 @@ int main(int argc, char **argv)
 	}
 
 	if (prefixStr != NULL) {
-		prefix = str_to_prefix(&familyIPv6, prefixStr, 0);
+		prefix = str_to_prefix(&flags, prefixStr, 0);
 		if (prefix < 0) {
 			if (!beSilent)
 				fprintf(stderr,
-					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", prefixStr);
+					"ipcalc: bad %s prefix: %s\n", (flags & FLAG_IPV6)?"IPv6":"IPv4", prefixStr);
 			return 1;
 		}
 	}
 
-	if (familyIPv6) {
+	if (flags & FLAG_IPV6) {
 		r = get_ipv6_info(ipStr, prefix, &info, flags);
 	} else {
 		if ((flags & FLAG_SHOW_BROADCAST) || (flags & FLAG_SHOW_NETWORK) || (flags & FLAG_SHOW_PREFIX)) {
@@ -1692,15 +1708,15 @@ int main(int argc, char **argv)
 
 	switch (app) {
 	case APP_SPLIT:
-		splitPrefix = str_to_prefix(&familyIPv6, splitStr, 1);
+		splitPrefix = str_to_prefix(&flags, splitStr, 1);
 		if (splitPrefix < 0) {
 			if (!beSilent)
 				fprintf(stderr,
-					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", splitStr);
+					"ipcalc: bad %s prefix: %s\n", (flags & FLAG_IPV6)?"IPv6":"IPv4", splitStr);
 			return 1;
 		}
 
-		if (familyIPv6) {
+		if (flags & FLAG_IPV6) {
 			show_split_networks_v6(splitPrefix, &info, flags);
 		} else {
 			show_split_networks_v4(splitPrefix, &info, flags);
@@ -1719,8 +1735,8 @@ int main(int argc, char **argv)
 	if (flags & FLAG_SHOW_MODERN_INFO) {
 		unsigned single_host = 0;
 
-		if ((familyIPv6 && info.prefix == 128) ||
-		    (!familyIPv6 && info.prefix == 32)) {
+		if (((flags & FLAG_IPV6) && info.prefix == 128) ||
+		    (!(flags & FLAG_IPV6) && info.prefix == 32)) {
 			single_host = 1;
 		}
 
@@ -1774,7 +1790,7 @@ int main(int argc, char **argv)
 			if (info.hostmax)
 				default_printf(&jsonchain, "HostMax:\t", MAXADDR_NAME, "%s", info.hostmax);
 
-			if (familyIPv6 && info.prefix < 112 && !(flags & FLAG_JSON))
+			if ((flags & FLAG_IPV6) && info.prefix < 112 && !(flags & FLAG_JSON))
 				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "2^(%u) = %s", 128-info.prefix, info.hosts);
 			else
 				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
@@ -1825,7 +1841,7 @@ int main(int argc, char **argv)
 			printf("%u\n", info.prefix);
 		}
 
-		if ((flags & FLAG_SHOW_BROADCAST) && !familyIPv6) {
+		if ((flags & FLAG_SHOW_BROADCAST) && !(flags & FLAG_IPV6)) {
 			if (! (flags & FLAG_NO_DECORATE)) {
 				printf(BROADCAST_NAME"=");
 			}
@@ -1931,3 +1947,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
+
