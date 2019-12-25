@@ -109,6 +109,8 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 
 #define JSON_FIRST 0
 #define JSON_NEXT  1
+#define JSON_ARRAY_FIRST 2
+#define JSON_ARRAY_NEXT  3
 
 void
 __attribute__ ((format(printf, 3, 4)))
@@ -125,6 +127,11 @@ default_printf(unsigned * const jsonfirst, const char *title, const char *jsonti
 void
 __attribute__ ((format(printf, 4, 5)))
 dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...);
+
+void array_start(unsigned * const jsonfirst, const char *head, const char *json_head);
+void array_stop(unsigned * const jsonfirst);
+void output_start(unsigned * const jsonfirst);
+void output_stop(unsigned * const jsonfirst);
 
 extern int beSilent;
 

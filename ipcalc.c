@@ -1192,6 +1192,53 @@ void usage(unsigned verbose)
 	}
 }
 
+void output_start(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("{\n");
+	}
+
+	*jsonfirst = JSON_FIRST;
+}
+
+void output_separate(unsigned * const jsonfirst)
+{
+	if (!(flags & FLAG_JSON)) {
+		printf("\n");
+	}
+}
+
+void output_stop(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("\n}\n");
+	}
+}
+
+void array_start(unsigned * const jsonfirst, const char *head, const char *json_head)
+{
+	if (flags & FLAG_JSON) {
+		if (*jsonfirst == JSON_NEXT) {
+			printf(",\n  ");
+		}
+
+		printf("  \"%s\":[\n  ", json_head);
+	} else {
+		if (!(flags & FLAG_NO_DECORATE))
+			printf("[%s]\n", head);
+	}
+
+	*jsonfirst = JSON_ARRAY_FIRST;
+}
+
+void array_stop(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("]");
+		*jsonfirst = JSON_NEXT;
+	}
+}
+
 void
 __attribute__ ((format(printf, 3, 4)))
 color_printf(const char *color, const char *title, const char *fmt, ...)
@@ -1250,12 +1297,21 @@ void va_json_printf(unsigned * const jsonfirst, const char *jsontitle, const cha
 	if (ret < 0)
 		return;
 
-	if (*jsonfirst != JSON_FIRST) {
+	if (*jsonfirst == JSON_ARRAY_NEXT) {
+		fprintf(stdout, ",\n  ");
+	} else if (*jsonfirst == JSON_NEXT) {
 		fprintf(stdout, ",\n");
 	}
+
 	fprintf(stdout, "  ");
-	fprintf(stdout, "\"%s\":\"%s\"", jsontitle, str);
-	*jsonfirst = JSON_NEXT;
+	if (jsontitle)
+		fprintf(stdout, "\"%s\":\"%s\"", jsontitle, str);
+	else
+		fprintf(stdout, "\"%s\"", str);
+	if (*jsonfirst == JSON_FIRST)
+		*jsonfirst = JSON_NEXT;
+	else if (*jsonfirst == JSON_ARRAY_FIRST)
+		*jsonfirst = JSON_ARRAY_NEXT;
 
 	free(str);
 	return;
@@ -1268,10 +1324,12 @@ default_printf(unsigned * const jsonfirst, const char *title, const char *jsonti
 	va_list args;
 
 	va_start(args, fmt);
-	if (flags & FLAG_JSON) {
+	if (flags & FLAG_NO_DECORATE) {
+		vprintf(fmt, args);
+		printf("\n");
+	} else if (flags & FLAG_JSON) {
 		va_json_printf(jsonfirst, jsontitle, fmt, args);
-	}
-	else {
+	} else {
 		va_color_printf(KBLUE, title, fmt, args);
 	}
 	va_end(args);
@@ -1441,6 +1499,10 @@ int main(int argc, char **argv)
 			chptr = argv[optind++];
 	}
 
+	if ((flags & FLAG_JSON) && (flags & FLAG_NO_DECORATE)) {
+		flags &= ~FLAG_NO_DECORATE;
+	}
+
 	if (doVersion) {
 		printf("ipcalc %s\n", VERSION);
 		return 0;
@@ -1606,9 +1668,7 @@ int main(int argc, char **argv)
 			single_host = 1;
 		}
 
-		if (flags & FLAG_JSON) {
-			printf("{\n");
-		}
+		output_start(&jsonchain);
 
 		if ((!randomStr || single_host) &&
 		    (single_host || strcmp(info.network, info.ip) != 0)) {
@@ -1644,9 +1704,8 @@ int main(int argc, char **argv)
 			default_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
 
 		if (!single_host) {
-			if (! (flags & FLAG_JSON)) {
-				printf("\n");
-			}
+			output_separate(&jsonchain);
+
 			if (info.type)
 				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
@@ -1673,9 +1732,8 @@ int main(int argc, char **argv)
 		}
 
 		if (info.geoip_country || info.geoip_city || info.geoip_coord) {
-			if (! (flags & FLAG_JSON)) {
-				printf("\n");
-			}
+			output_separate(&jsonchain);
+
 			if (info.geoip_ccode)
 				dist_printf(&jsonchain, "Country code:\t", COUNTRYCODE_NAME, "%s", info.geoip_ccode);
 			if (info.geoip_country)
@@ -1686,9 +1744,7 @@ int main(int argc, char **argv)
 				dist_printf(&jsonchain, "Coordinates:\t", COORDINATES_NAME, "%s", info.geoip_coord);
 		}
 
-		if (flags & FLAG_JSON) {
-			printf("\n}\n");
-		}
+		output_stop(&jsonchain);
 
 	} else if (!(flags & FLAG_SHOW_INFO)) {
 
