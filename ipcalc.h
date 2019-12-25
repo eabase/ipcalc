@@ -74,11 +74,17 @@ typedef struct ip_info_st {
 	const char *class;
 } ip_info_st;
 
-#define FLAG_RESOLVE_HOST 1
-#define FLAG_RESOLVE_IP (1<<1)
-#define FLAG_CHECK_ADDRESS (1<<2)
-#define FLAG_SHOW_INFO (1<<3)
-#define FLAG_RANDOM (1<<4)
+enum app_t {
+	APP_VERSION=1,
+	APP_CHECK_ADDRESS=1<<1,
+	APP_SHOW_INFO=1<<2,
+	APP_RANDOM=1<<3,
+	APP_SPLIT=1<<4
+};
+
+#define FLAG_SHOW_MODERN_INFO (1<<3)
+#define FLAG_RESOLVE_IP (1<<4)
+#define FLAG_RESOLVE_HOST (1<<5)
 #define FLAG_SHOW_BROADCAST (1<<6)
 #define FLAG_SHOW_NETMASK (1<<7)
 #define FLAG_SHOW_NETWORK (1<<8)
@@ -89,10 +95,9 @@ typedef struct ip_info_st {
 #define FLAG_SHOW_ADDRSPACE (1<<13)
 #define FLAG_GET_GEOIP (1<<14)
 #define FLAG_SHOW_GEOIP ((1<<15)|FLAG_GET_GEOIP)
-#define FLAG_SHOW_ALL_INFO ((1<<16)|FLAG_SHOW_INFO)
+#define FLAG_SHOW_ALL_INFO (1<<16)
 #define FLAG_SHOW_REVERSE (1<<17)
 #define FLAG_ASSUME_CLASS_PREFIX (1<<18)
-#define FLAG_SPLIT (1<<19)
 #define FLAG_NO_DECORATE (1<<20)
 #define FLAG_SHOW_ADDRESS (1<<21)
 #define FLAG_JSON (1<<22)
@@ -101,9 +106,8 @@ typedef struct ip_info_st {
 #define FLAGS_TO_IGNORE (FLAG_GET_GEOIP|FLAG_NO_DECORATE|FLAG_JSON|FLAG_ASSUME_CLASS_PREFIX|(1<<16))
 #define FLAGS_TO_IGNORE_MASK (~FLAGS_TO_IGNORE)
 
-/* Flags that can be combined */
-#define FLAGS_MULTI (FLAG_SHOW_BROADCAST|FLAG_SHOW_NETMASK|FLAG_SHOW_NETWORK|FLAG_SHOW_PREFIX|FLAG_SHOW_MINADDR|FLAG_SHOW_MAXADDR|FLAG_SHOW_ADDRESSES|FLAG_SHOW_ADDRSPACE|FLAG_SHOW_GEOIP|FLAG_SHOW_REVERSE)
-#define FLAGS_MULTI_MASK (~FLAGS_MULTI)
+#define ENV_INFO_FLAGS (FLAG_SHOW_NETMASK|FLAG_SHOW_BROADCAST|FLAG_RESOLVE_IP|FLAG_RESOLVE_HOST|FLAG_SHOW_ADDRESS|FLAG_SHOW_REVERSE|FLAG_SHOW_GEOIP|FLAG_SHOW_ADDRSPACE|FLAG_SHOW_ADDRESSES|FLAG_SHOW_MAXADDR|FLAG_SHOW_MINADDR|FLAG_SHOW_PREFIX|FLAG_SHOW_NETWORK)
+#define ENV_INFO_MASK (~ENV_INFO_FLAGS)
 
 void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info, unsigned flags);
 void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info, unsigned flags);

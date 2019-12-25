@@ -862,6 +862,14 @@ test('JsonTestHumanReadableGenericInfoPrefix56',
 		files('json-i-2a03:2880:20:4f06:face:b00c:0:1-56')
 	]
 )
+test('JsonTestHumanReadableSpecificInfo',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -n 2a03:2880:20:4f06:face:b00c:0:1/56',
+		files('json-i-2a03:2880:20:4f06:face:b00c:0:1-56')
+	]
+)
 test('AllInfo',
 	testrunner,
 	args : [
@@ -875,6 +883,14 @@ test('Info',
 	args : [
 		'--test-outfile',
 		ipcalc.full_path() + ' -i 192.168.2.7/24',
+		files('info-192.168.2.7')
+	]
+)
+test('InfoImplicit',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' 192.168.2.7/24',
 		files('info-192.168.2.7')
 	]
 )
