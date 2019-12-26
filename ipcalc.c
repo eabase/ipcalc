@@ -258,17 +258,10 @@ static char *get_ip_address(int family, const char *host)
 static int bit_count(uint32_t i)
 {
 	int c = 0;
-	unsigned int seen_one = 0;
 
 	while (i > 0) {
-		if (i & 1) {
-			seen_one = 1;
+		if (i & 1)
 			c++;
-		} else {
-			if (seen_one) {
-				return -1;
-			}
-		}
 		i >>= 1;
 	}
 
@@ -286,7 +279,23 @@ static int bit_count(uint32_t i)
   \return the number of significant bits.  */
 static int mask2prefix(struct in_addr mask)
 {
-	return bit_count(ntohl(mask.s_addr));
+	int c = 0;
+	unsigned int seen_one = 0;
+	uint32_t i = ntohl(mask.s_addr);
+
+	while (i > 0) {
+		if (i & 1) {
+			seen_one = 1;
+			c++;
+		} else {
+			if (seen_one) {
+				return -1;
+			}
+		}
+		i >>= 1;
+	}
+
+	return c;
 }
 
 static
@@ -1149,11 +1158,9 @@ void usage(unsigned verbose)
 		fprintf(stderr, "                                  (default)\n");
 		fprintf(stderr, "      --all-info                  Print verbose information on the provided IP\n");
 		fprintf(stderr, "                                  address\n");
-		fprintf(stderr, "      --reverse-dns               Print network in a the reverse DNS format\n");
-		fprintf(stderr, "  -4, --ipv4                      Explicitly specify the IPv4 address family\n");
-		fprintf(stderr, "  -6, --ipv6                      Explicitly specify the IPv6 address family\n");
 		fprintf(stderr, "\n");
 		fprintf(stderr, "Specific info options:\n");
+		fprintf(stderr, "      --reverse-dns               Print network in a the reverse DNS format\n");
 		fprintf(stderr, "  -a, --address                   Display IP address\n");
 		fprintf(stderr, "  -b, --broadcast                 Display calculated broadcast address\n");
 		fprintf(stderr, "  -m, --netmask                   Display netmask for IP\n");
@@ -1173,6 +1180,8 @@ void usage(unsigned verbose)
 #endif
 		fprintf(stderr, "\n");
 		fprintf(stderr, "Other options:\n");
+		fprintf(stderr, "  -4, --ipv4                      Explicitly specify the IPv4 address family\n");
+		fprintf(stderr, "  -6, --ipv6                      Explicitly specify the IPv6 address family\n");
 		fprintf(stderr, "      --class-prefix              When specified the default prefix will be determined\n");
 		fprintf(stderr, "                                  by the IPv4 address class\n");
 		fprintf(stderr, "      --no-decorate               Print only the requested information\n");
@@ -1189,6 +1198,53 @@ void usage(unsigned verbose)
 		fprintf(stderr, "        [--addresses] [--addrspace] [-j|--json] [-s|--silent] [-v|--version]\n");
 		fprintf(stderr, "        [--reverse-dns] [--class-prefix]\n");
 		fprintf(stderr, "        [-?|--help] [--usage]\n");
+	}
+}
+
+void output_start(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("{\n");
+	}
+
+	*jsonfirst = JSON_FIRST;
+}
+
+void output_separate(unsigned * const jsonfirst)
+{
+	if (!(flags & FLAG_JSON)) {
+		printf("\n");
+	}
+}
+
+void output_stop(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("\n}\n");
+	}
+}
+
+void array_start(unsigned * const jsonfirst, const char *head, const char *json_head)
+{
+	if (flags & FLAG_JSON) {
+		if (*jsonfirst == JSON_NEXT) {
+			printf(",\n  ");
+		}
+
+		printf("  \"%s\":[\n  ", json_head);
+	} else {
+		if (!(flags & FLAG_NO_DECORATE))
+			printf("[%s]\n", head);
+	}
+
+	*jsonfirst = JSON_ARRAY_FIRST;
+}
+
+void array_stop(unsigned * const jsonfirst)
+{
+	if (flags & FLAG_JSON) {
+		printf("]");
+		*jsonfirst = JSON_NEXT;
 	}
 }
 
@@ -1250,12 +1306,21 @@ void va_json_printf(unsigned * const jsonfirst, const char *jsontitle, const cha
 	if (ret < 0)
 		return;
 
-	if (*jsonfirst != JSON_FIRST) {
+	if (*jsonfirst == JSON_ARRAY_NEXT) {
+		fprintf(stdout, ",\n  ");
+	} else if (*jsonfirst == JSON_NEXT) {
 		fprintf(stdout, ",\n");
 	}
+
 	fprintf(stdout, "  ");
-	fprintf(stdout, "\"%s\":\"%s\"", jsontitle, str);
-	*jsonfirst = JSON_NEXT;
+	if (jsontitle)
+		fprintf(stdout, "\"%s\":\"%s\"", jsontitle, str);
+	else
+		fprintf(stdout, "\"%s\"", str);
+	if (*jsonfirst == JSON_FIRST)
+		*jsonfirst = JSON_NEXT;
+	else if (*jsonfirst == JSON_ARRAY_FIRST)
+		*jsonfirst = JSON_ARRAY_NEXT;
 
 	free(str);
 	return;
@@ -1268,10 +1333,12 @@ default_printf(unsigned * const jsonfirst, const char *title, const char *jsonti
 	va_list args;
 
 	va_start(args, fmt);
-	if (flags & FLAG_JSON) {
+	if (flags & FLAG_NO_DECORATE) {
+		vprintf(fmt, args);
+		printf("\n");
+	} else if (flags & FLAG_JSON) {
 		va_json_printf(jsonfirst, jsontitle, fmt, args);
-	}
-	else {
+	} else {
 		va_color_printf(KBLUE, title, fmt, args);
 	}
 	va_end(args);
@@ -1328,18 +1395,17 @@ dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle
 */
 int main(int argc, char **argv)
 {
-	int doCheck = 0;
 	int familyIPv4 = 0, familyIPv6 = 0;
 	char *randomStr = NULL;
 	char *hostname = NULL;
 	char *splitStr = NULL;
-	int doVersion = 0;
 	char *ipStr = NULL, *prefixStr = NULL, *netmaskStr = NULL, *chptr = NULL;
 	int prefix = -1, splitPrefix = -1;
 	ip_info_st info;
 	int r = 0;
 	int c;
 	unsigned jsonchain = JSON_FIRST;
+	enum app_t app = 0;
 
 	while (1) {
 		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsv", long_options, NULL);
@@ -1348,27 +1414,31 @@ int main(int argc, char **argv)
 
 		switch(c) {
 			case 'c':
-				flags |= FLAG_CHECK_ADDRESS;
+				app |= APP_CHECK_ADDRESS;
 				break;
 			case 'S':
-				flags |= FLAG_SPLIT;
+				app |= APP_SPLIT;
 				splitStr = safe_strdup(optarg);
 				if (splitStr == NULL) exit(1);
 				break;
 			case 'r':
+				app |= APP_RANDOM;
 				randomStr = safe_strdup(optarg);
 				if (randomStr == NULL) exit(1);
 				break;
 			case 'i':
-				flags |= FLAG_SHOW_INFO;
+				app |= APP_SHOW_INFO;
+				flags |= FLAG_SHOW_MODERN_INFO;
 				break;
 			case OPT_ALLINFO:
-				flags |= FLAG_SHOW_ALL_INFO;
+				app |= APP_SHOW_INFO;
+				flags |= FLAG_SHOW_ALL_INFO|FLAG_SHOW_MODERN_INFO;
 				break;
 			case OPT_CLASS_PREFIX:
 				flags |= FLAG_ASSUME_CLASS_PREFIX;
 				break;
 			case OPT_REVERSE:
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_REVERSE;
 				break;
 			case '4':
@@ -1378,40 +1448,53 @@ int main(int argc, char **argv)
 				familyIPv6 = 1;
 				break;
 			case 'a':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_ADDRESS;
 				break;
 			case 'b':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_BROADCAST;
 				break;
 			case 'h':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_RESOLVE_HOST;
 				break;
 			case 'o':
+				app |= APP_SHOW_INFO;
+				flags |= FLAG_RESOLVE_IP;
 				hostname = safe_strdup(optarg);
 				if (hostname == NULL) exit(1);
 				break;
 			case 'g':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_GEOIP;
 				break;
 			case 'm':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_NETMASK;
 				break;
 			case 'n':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_NETWORK;
 				break;
 			case 'p':
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_PREFIX;
 				break;
 			case OPT_MINADDR:
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_MINADDR;
 				break;
 			case OPT_MAXADDR:
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_MAXADDR;
 				break;
 			case OPT_ADDRESSES:
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_ADDRESSES;
 				break;
 			case OPT_ADDRSPACE:
+				app |= APP_SHOW_INFO;
 				flags |= FLAG_SHOW_ADDRSPACE;
 				break;
 			case OPT_NO_DECORATE:
@@ -1424,7 +1507,7 @@ int main(int argc, char **argv)
 				beSilent = 1;
 				break;
 			case 'v':
-				doVersion = 1;
+				app |= APP_VERSION;
 				break;
 			case OPT_USAGE:
 				usage(0);
@@ -1441,9 +1524,25 @@ int main(int argc, char **argv)
 			chptr = argv[optind++];
 	}
 
-	if (doVersion) {
-		printf("ipcalc %s\n", VERSION);
-		return 0;
+	if ((flags & FLAG_JSON) && (flags & FLAG_NO_DECORATE)) {
+		flags &= ~FLAG_NO_DECORATE;
+	}
+
+	if (!(flags & FLAGS_TO_IGNORE_MASK))
+		flags |= FLAG_SHOW_MODERN_INFO;
+
+	/* Only the modern info flag results to JSON output */
+	if ((flags & ENV_INFO_MASK) && (flags & FLAG_JSON))
+		flags |= FLAG_SHOW_MODERN_INFO;
+
+	if (geo_setup() == 0 && (flags & FLAG_SHOW_ALL_INFO))
+		flags |= FLAG_GET_GEOIP;
+
+	if (bit_count(app) > 1) {
+		if (!beSilent)
+			fprintf(stderr,
+				"ipcalc: you cannot mix these options\n");
+		return 1;
 	}
 
 	if (familyIPv6 && familyIPv4) {
@@ -1453,21 +1552,47 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (hostname)
-		flags |= FLAG_RESOLVE_IP;
-
-	if (geo_setup() == 0 &&
-        ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO))
-		flags |= FLAG_GET_GEOIP;
-
-	if ((hostname && randomStr) || (hostname && splitStr) || (randomStr && splitStr)) {
-		if (!beSilent)
-			fprintf(stderr,
-				"ipcalc: you cannot mix these options\n");
-		return 1;
+	/* if there is a : in the address, it is an IPv6 address.
+	 * Note that we allow -4, and -6 to be given explicitly, so
+	 * that the tool can be used to check for a valid IPv4 or IPv6
+	 * address.
+	 */
+	if (familyIPv4 == 0 && ipStr && strchr(ipStr, ':') != NULL) {
+		familyIPv6 = 1;
 	}
 
-	if (hostname == NULL && randomStr == NULL && !ipStr) {
+	switch (app) {
+	case APP_VERSION:
+		printf("ipcalc %s\n", VERSION);
+		return 0;
+	case APP_RANDOM:
+		prefix = str_to_prefix(&familyIPv6, randomStr, 1);
+		if (prefix < 0) {
+			if (!beSilent)
+				fprintf(stderr,
+					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", randomStr);
+			return 1;
+		}
+
+		ipStr = generate_ip_network(familyIPv6, prefix);
+		if (ipStr == NULL) {
+			if (!beSilent)
+				fprintf(stderr,
+					"ipcalc: cannot generate network with prefix: %u\n",
+					prefix);
+			return 1;
+		}
+		/* fallthrough to info */
+	case APP_SPLIT:
+	case APP_CHECK_ADDRESS:
+	case APP_SHOW_INFO:
+		/* These are handled lower into the info app */
+		break;
+	}
+
+	/* The main application which displays information about an address or
+	 * a network. */
+	if (hostname == NULL && ipStr == NULL) {
 		if (!beSilent) {
 			fprintf(stderr,
 				"ipcalc: ip address expected\n");
@@ -1491,40 +1616,10 @@ int main(int argc, char **argv)
 					"ipcalc: could not resolve %s\n", hostname);
 			return 1;
 		}
-	} else if (randomStr) { /* generate a random private network if asked */
-		prefix = str_to_prefix(&familyIPv6, randomStr, 1);
-		if (prefix < 0) {
-			if (!beSilent)
-				fprintf(stderr,
-					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", randomStr);
-			return 1;
-		}
 
-		ipStr = generate_ip_network(familyIPv6, prefix);
-		if (ipStr == NULL) {
-			if (!beSilent)
-				fprintf(stderr,
-					"ipcalc: cannot generate network with prefix: %u\n",
-					prefix);
-			return 1;
+		if (familyIPv4 == 0 && strchr(ipStr, ':') != NULL) {
+			familyIPv6 = 1;
 		}
-	} else if (splitStr) {
-		splitPrefix = str_to_prefix(&familyIPv6, splitStr, 1);
-		if (splitPrefix < 0) {
-			if (!beSilent)
-				fprintf(stderr,
-					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", splitStr);
-			return 1;
-		}
-	}
-
-	/* if there is a : in the address, it is an IPv6 address.
-	 * Note that we allow -4, and -6 to be given explicitly, so
-	 * that the tool can be used to check for a valid IPv4 or IPv6
-	 * address.
-	 */
-	if (familyIPv4 == 0 && strchr(ipStr, ':') != NULL) {
-		familyIPv6 = 1;
 	}
 
 	if (chptr) {
@@ -1586,19 +1681,33 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	if (doCheck)
-		return 0;
+	switch (app) {
+	case APP_SPLIT:
+		splitPrefix = str_to_prefix(&familyIPv6, splitStr, 1);
+		if (splitPrefix < 0) {
+			if (!beSilent)
+				fprintf(stderr,
+					"ipcalc: bad %s prefix: %s\n", familyIPv6?"IPv6":"IPv4", splitStr);
+			return 1;
+		}
 
-	/* if no option is given, print information on IP */
-	if (!(flags & FLAGS_TO_IGNORE_MASK)) {
-		flags |= FLAG_SHOW_INFO;
+		if (familyIPv6) {
+			show_split_networks_v6(splitPrefix, &info, flags);
+		} else {
+			show_split_networks_v4(splitPrefix, &info, flags);
+		}
+		return 0;
+	case APP_CHECK_ADDRESS:
+		return 0;
+	default:
+		break;
 	}
 
 	if (isatty(STDOUT_FILENO) != 0)
 		colors = 1;
 
 	/* we know what we want to display now, so display it. */
-	if (flags & FLAG_SHOW_INFO && !(flags & FLAG_SPLIT)) {
+	if (flags & FLAG_SHOW_MODERN_INFO) {
 		unsigned single_host = 0;
 
 		if ((familyIPv6 && info.prefix == 128) ||
@@ -1606,9 +1715,7 @@ int main(int argc, char **argv)
 			single_host = 1;
 		}
 
-		if (flags & FLAG_JSON) {
-			printf("{\n");
-		}
+		output_start(&jsonchain);
 
 		if ((!randomStr || single_host) &&
 		    (single_host || strcmp(info.network, info.ip) != 0)) {
@@ -1640,17 +1747,16 @@ int main(int argc, char **argv)
 				default_printf(&jsonchain, "Broadcast:\t", BROADCAST_NAME, "%s", info.broadcast);
 		}
 
-		if (((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO) && info.reverse_dns)
+		if ((flags & FLAG_SHOW_ALL_INFO) && info.reverse_dns)
 			default_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
 
 		if (!single_host) {
-			if (! (flags & FLAG_JSON)) {
-				printf("\n");
-			}
+			output_separate(&jsonchain);
+
 			if (info.type)
 				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
-			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
+			if ((flags & FLAG_SHOW_ALL_INFO) && info.class)
 				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 
 			if (info.hostmin)
@@ -1668,14 +1774,13 @@ int main(int argc, char **argv)
 			if (info.type)
 				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
-			if ((flags & FLAG_SHOW_ALL_INFO) == FLAG_SHOW_ALL_INFO && info.class)
+			if ((flags & FLAG_SHOW_ALL_INFO) && info.class)
 				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 		}
 
 		if (info.geoip_country || info.geoip_city || info.geoip_coord) {
-			if (! (flags & FLAG_JSON)) {
-				printf("\n");
-			}
+			output_separate(&jsonchain);
+
 			if (info.geoip_ccode)
 				dist_printf(&jsonchain, "Country code:\t", COUNTRYCODE_NAME, "%s", info.geoip_ccode);
 			if (info.geoip_country)
@@ -1686,11 +1791,9 @@ int main(int argc, char **argv)
 				dist_printf(&jsonchain, "Coordinates:\t", COORDINATES_NAME, "%s", info.geoip_coord);
 		}
 
-		if (flags & FLAG_JSON) {
-			printf("\n}\n");
-		}
+		output_stop(&jsonchain);
 
-	} else if (!(flags & FLAG_SHOW_INFO)) {
+	} else if (!(flags & FLAG_SHOW_MODERN_INFO)) {
 
 		if (flags & FLAG_SHOW_ADDRESS) {
 			if (! (flags & FLAG_NO_DECORATE)) {
@@ -1814,14 +1917,6 @@ int main(int argc, char **argv)
 				}
 				printf("\"%s\"\n", info.geoip_coord);
 			}
-		}
-	}
-
-	if (flags & FLAG_SPLIT) {
-		if (familyIPv6) {
-			show_split_networks_v6(splitPrefix, &info, flags);
-		} else {
-			show_split_networks_v4(splitPrefix, &info, flags);
 		}
 	}
 

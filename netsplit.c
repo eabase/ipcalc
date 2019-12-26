@@ -53,7 +53,6 @@ void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info
 	uint32_t nmask = ntohl(prefix2mask(info->prefix));
 	struct in_addr net, broadcast;
 	unsigned jsonchain = JSON_FIRST;
-	unsigned jsonchainarray = JSON_FIRST;
 
 	if (splitmask < nmask) {
 		if (!beSilent)
@@ -62,14 +61,8 @@ void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info
 		exit(1);
 	}
 
-	if (flags & FLAG_JSON) {
-		printf("{\n");
-		printf("  \"SPLITNETWORK\":[");
-	}
-	else {
-		if (!(flags & FLAG_NO_DECORATE))
-			printf("[Split networks]\n");
-	}
+	output_start(&jsonchain);
+	array_start(&jsonchain, "Split networks", "SPLITNETWORK");
 
 	if (inet_pton(AF_INET, info->network, &net) <= 0) {
 		if (!beSilent)
@@ -106,42 +99,28 @@ void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info
 	start = net.s_addr;
 	end = net.s_addr + diff - 1;
 	count = 0;
-	jsonchainarray = JSON_FIRST;
 	while (1) {
-		if (flags & FLAG_JSON) {
-			if (jsonchainarray != JSON_FIRST) {
-				printf(",");
-			}
-			printf("\n    \"%s/%u\"", numtoquad(start), split_prefix);
-			jsonchainarray = JSON_NEXT;
+		if (!(flags & FLAG_NO_DECORATE) || (flags & FLAG_JSON)) {
+			default_printf(&jsonchain, "Network:\t", NULL, "%s/%u", numtoquad(start), split_prefix);
+		} else {
+			printf("%s/%u\n", numtoquad(start), split_prefix);
 		}
-		else {
-			if (!(flags & FLAG_NO_DECORATE)) {
-				default_printf(&jsonchain, "Network:\t", "NETWORK", "%s/%u", numtoquad(start), split_prefix);
-			}
-			else {
-				printf("%s/%u\n", numtoquad(start), split_prefix);
-			}
 
-		}
 		count++;
 		start += diff;
 		if (end == 0xffffffff || end >= broadcast.s_addr)
 			break;
 		end += diff;
 	}
-	if (flags & FLAG_JSON) {
-		printf("]");
-		jsonchain = JSON_NEXT;
-	}
+
+	array_stop(&jsonchain);
 
 	if ((!(flags & FLAG_NO_DECORATE)) || (flags & FLAG_JSON)) {
 		dist_printf(&jsonchain, "\nTotal:  \t", "NETS", "%u", count);
 		dist_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", ipv4_prefix_to_hosts(buf, sizeof(buf), split_prefix));
 	}
-	if (flags & FLAG_JSON) {
-		printf("\n}\n");
-	}
+
+	output_stop(&jsonchain);
 }
 
 static const char *ipv6tostr(struct in6_addr *ip)
@@ -178,7 +157,6 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 	struct in6_addr splitmask, net, netmask, sdiff, ediff, start, end, tmpaddr, netlast;
 	char buf[32];
 	unsigned jsonchain = JSON_FIRST;
-	unsigned jsonchainarray = JSON_FIRST;
 
 	if (inet_pton(AF_INET6, info->network, &net) <= 0) {
 		if (!beSilent)
@@ -237,32 +215,16 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 	tmpaddr.s6_addr[15] = 1;
 	v6add(&sdiff, &tmpaddr);
 
-	if (flags & FLAG_JSON) {
-		printf("{\n");
-		printf("  \"SPLITNETWORK\":[");
-	}
-	else {
-		if (!(flags & FLAG_NO_DECORATE))
-			printf("[Split networks]\n");
-	}
+	output_start(&jsonchain);
+
+	array_start(&jsonchain, "Split networks", "SPLITNETWORK");
 
 	i = count = 0;
-	jsonchainarray = JSON_FIRST;
 	while (!i) {
-		if (flags & FLAG_JSON) {
-			if (jsonchainarray != JSON_FIRST) {
-				printf(",");
-			}
-			printf("\n    \"%s/%u\"", ipv6tostr(&start), split_prefix);
-			jsonchainarray = JSON_NEXT;
-		}
-		else {
-			if (!(flags & FLAG_NO_DECORATE)) {
-				default_printf(&jsonchainarray, "Network:\t", "NETWORK", "%s/%u", ipv6tostr(&start), split_prefix);
-			}
-			else {
-				printf("%s/%u\n", ipv6tostr(&start), split_prefix);
-			}
+		if (!(flags & FLAG_NO_DECORATE) || (flags & FLAG_JSON)) {
+			default_printf(&jsonchain, "Network:\t", NULL, "%s/%u", ipv6tostr(&start), split_prefix);
+		} else {
+			printf("%s/%u\n", ipv6tostr(&start), split_prefix);
 		}
 
 		v6add(&start, &sdiff);
@@ -294,18 +256,14 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 		count++;
 	}
 
-	if (flags & FLAG_JSON) {
-		printf("]");
-		jsonchain = JSON_NEXT;
-	}
+	array_stop(&jsonchain);
 
 	if ((!(flags & FLAG_NO_DECORATE)) || (flags & FLAG_JSON)) {
 		dist_printf(&jsonchain, "\nTotal:  \t", "NETS", "%u", count);
 		dist_printf(&jsonchain, "Hosts/Net:\t", "ADDRESSES", "%s", ipv6_prefix_to_hosts(buf, sizeof(buf), split_prefix));
 	}
-	if (flags & FLAG_JSON) {
-		printf("\n}\n");
-	}
+
+	output_stop(&jsonchain);
 
 }
 
