@@ -36,6 +36,54 @@ test('Random-Info',
 		ipcalc.full_path() + ' -r 24 -i 127.0.0.1'
 	]
 )
+test('HostnameIPv6Localhost',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -6 -o localhost',
+		files('hostname-localhost-ipv6')
+	]
+)
+test('HostnameIPv4Localhost',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -4 -o localhost',
+		files('hostname-localhost-ipv4')
+	]
+)
+test('HostnameIPv4LocalhostJson',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -4 -o localhost',
+		files('hostname-localhost-ipv4-json')
+	]
+)
+test('IPIPv6Localhost',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -h ::1',
+		files('ip-localhost-ipv6')
+	]
+)
+test('HostnameIPv4Localhost',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -h 127.0.0.1',
+		files('ip-localhost-ipv4')
+	]
+)
+test('HostnameIPv4LocalhostJson',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -j -h 127.0.0.1',
+		files('ip-localhost-ipv4-json')
+	]
+)
 # --class-prefix tests
 test('AssignClassPrefix12',
 	testrunner,
