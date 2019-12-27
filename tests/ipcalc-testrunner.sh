@@ -32,13 +32,6 @@ fail() {
 	echo -e "Output was:\n$1"
 }
 
-TestSuccessVerbatim() {
-	echo -n "Checking $@... "
-	output=$(sh -c '$1' 2>&1)
-	rc=$?
-	[ $rc -eq 0 ] && ok || fail $output
-}
-
 TestSuccess() {
 	echo -n "Checking $@... "
 	output=$(sh -c "$1" 2>&1)
@@ -79,7 +72,6 @@ TestEqual() {
 
 while [ $# -gt 0 ]; do
 	case $1 in
-		--test-success-verbatim) TestSuccessVerbatim "$2"; shift ;;
 		--test-success) TestSuccess "$2"; shift ;;
 		--test-failure) TestFailure "$2"; shift ;;
 		--test-output)  TestOutput "$2" "$3"; shift; shift ;;

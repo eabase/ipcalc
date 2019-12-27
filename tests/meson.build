@@ -1028,36 +1028,14 @@ test('DeaggregateIPv6Json',
 )
 # Test whether we can deaggregate a randomly generated network
 test('DeaggregateIPv6Random',
-	testrunner,
-	args : [
-		'--test-success-verbatim',
-		'eval ' + '$(' + ipcalc.full_path() + ' -r 96 --prefix -n --minaddr --maxaddr)' +
-		'; test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
-	]
+	find_program('ipcalc-delegate-ipv6-random.sh'),
+	env : ['IPCALC=' + ipcalc.full_path()]
 )
 test('DeaggregateSplitIPv6',
-	testrunner,
-	args : [
-		'--test-success-verbatim',
-		'eval ' + '$(' + ipcalc.full_path() + ' -r 56 --prefix -n);' +
-		'HEAD=$(' + ipcalc.full_path() + ' -S 64 ${NETWORK}/${PREFIX} --no-decorate|head -1;' +
-		'TAIL=$(' + ipcalc.full_path() + ' -S 64 ${NETWORK}/${PREFIX} --no-decorate|tail -1;' +	
-		'FIRST=$(' + ipcalc.full_path() + ' --no-decorate --minaddr ${HEAD});' +
-		'LAST=$(' + ipcalc.full_path() + ' --no-decorate --maxaddr ${TAIL});' +
-		'NEW=$(' + ipcalc.full_path() + ' --no-decorate -d "${FIRST} - ${LAST}");' +
-		'test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
-	]
+	find_program('ipcalc-delegate-split-ipv6.sh'),
+	env : ['IPCALC=' + ipcalc.full_path()]
 )
 test('DeaggregateSplitIPv4',
-	testrunner,
-	args : [
-		'--test-success-verbatim',
-		'eval ' + '$(' + ipcalc.full_path() + ' -r 24 --prefix -n);' +
-		'HEAD=$(' + ipcalc.full_path() + ' -S 26 ${NETWORK}/${PREFIX} --no-decorate|head -1;' +
-		'TAIL=$(' + ipcalc.full_path() + ' -S 26 ${NETWORK}/${PREFIX} --no-decorate|tail -1;' +	
-		'FIRST=$(' + ipcalc.full_path() + ' --no-decorate -n ${HEAD});' +
-		'LAST=$(' + ipcalc.full_path() + ' --no-decorate -b ${TAIL});' +
-		'NEW=$(' + ipcalc.full_path() + ' --no-decorate -d "${FIRST} - ${LAST}");' +
-		'test "$(' + ipcalc.full_path() + ' -d "${MINADDR}-${MAXADDR}" --no-decorate)" = "${NETWORK}/${PREFIX}"'
-	]
+	find_program('ipcalc-delegate-split-ipv4.sh'),
+	env : ['IPCALC=' + ipcalc.full_path()]
 )
