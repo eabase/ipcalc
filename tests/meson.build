@@ -43,6 +43,13 @@ test('Random',
 		ipcalc.full_path() + ' -r 24' + '|grep Address'
 	]
 )
+test('RandomAddress',
+	testrunner,
+	args : [
+		'--test-success',
+		ipcalc.full_path() + ' -r 24 -a' + '|grep ADDRESS'
+	]
+)
 test('RandomIPv6Implicit',
 	testrunner,
 	args : [

@@ -1422,7 +1422,8 @@ int main(int argc, char **argv)
 				if (splitStr == NULL) exit(1);
 				break;
 			case 'r':
-				app |= APP_RANDOM;
+				app |= APP_SHOW_INFO;
+				flags |= FLAG_RANDOM;
 				randomStr = safe_strdup(optarg);
 				if (randomStr == NULL) exit(1);
 				break;
@@ -1565,7 +1566,23 @@ int main(int argc, char **argv)
 	case APP_VERSION:
 		printf("ipcalc %s\n", VERSION);
 		return 0;
-	case APP_RANDOM:
+	case APP_SPLIT:
+	case APP_CHECK_ADDRESS:
+	case APP_SHOW_INFO:
+		/* These are handled lower into the info app */
+		break;
+	}
+
+	/* The main application which displays information about an address or
+	 * a network. */
+	if (flags & FLAG_RANDOM) {
+		if (ipStr) {
+			if (!beSilent)
+				fprintf(stderr,
+					"ipcalc: provided superfluous parameter '%s'\n", ipStr);
+			return 1;
+		}
+
 		prefix = str_to_prefix(&familyIPv6, randomStr, 1);
 		if (prefix < 0) {
 			if (!beSilent)
@@ -1582,16 +1599,8 @@ int main(int argc, char **argv)
 					prefix);
 			return 1;
 		}
-		/* fallthrough to info */
-	case APP_SPLIT:
-	case APP_CHECK_ADDRESS:
-	case APP_SHOW_INFO:
-		/* These are handled lower into the info app */
-		break;
 	}
 
-	/* The main application which displays information about an address or
-	 * a network. */
 	if (hostname == NULL && ipStr == NULL) {
 		if (!beSilent) {
 			fprintf(stderr,
