@@ -48,6 +48,8 @@ char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix);
 uint32_t prefix2mask(int prefix);
 int ipv6_prefix_to_mask(unsigned prefix, struct in6_addr *mask);
 
+struct in_addr calc_network(struct in_addr addr, int prefix);
+
 char *ipv4_prefix_to_hosts(char *hosts, unsigned hosts_size, unsigned prefix);
 char *ipv6_prefix_to_hosts(char *hosts, unsigned hosts_size, unsigned prefix);
 
@@ -78,9 +80,12 @@ enum app_t {
 	APP_VERSION=1,
 	APP_CHECK_ADDRESS=1<<1,
 	APP_SHOW_INFO=1<<2,
-	APP_SPLIT=1<<3
+	APP_SPLIT=1<<3,
+	APP_DEAGGREGATE=1<<4
 };
 
+#define FLAG_IPV6 (1<<1)
+#define FLAG_IPV4 (1<<2)
 #define FLAG_SHOW_MODERN_INFO (1<<3)
 #define FLAG_RESOLVE_IP (1<<4)
 #define FLAG_RESOLVE_HOST (1<<5)
@@ -103,7 +108,7 @@ enum app_t {
 #define FLAG_RANDOM (1<<23)
 
 /* Flags that are modifying an existing option */
-#define FLAGS_TO_IGNORE (FLAG_GET_GEOIP|FLAG_NO_DECORATE|FLAG_JSON|FLAG_ASSUME_CLASS_PREFIX|(1<<16)|FLAG_RANDOM)
+#define FLAGS_TO_IGNORE (FLAG_IPV6|FLAG_IPV4|FLAG_GET_GEOIP|FLAG_NO_DECORATE|FLAG_JSON|FLAG_ASSUME_CLASS_PREFIX|(1<<16)|FLAG_RANDOM)
 #define FLAGS_TO_IGNORE_MASK (~FLAGS_TO_IGNORE)
 
 #define ENV_INFO_FLAGS (FLAG_SHOW_NETMASK|FLAG_SHOW_BROADCAST|FLAG_RESOLVE_IP|FLAG_RESOLVE_HOST|FLAG_SHOW_ADDRESS|FLAG_SHOW_REVERSE|FLAG_SHOW_GEOIP|FLAG_SHOW_ADDRSPACE|FLAG_SHOW_ADDRESSES|FLAG_SHOW_MAXADDR|FLAG_SHOW_MINADDR|FLAG_SHOW_PREFIX|FLAG_SHOW_NETWORK)
@@ -111,6 +116,8 @@ enum app_t {
 
 void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info, unsigned flags);
 void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info, unsigned flags);
+
+void deaggregate(char *str, unsigned flags);
 
 #define KBLUE  "\x1B[34m"
 #define KMAG   "\x1B[35m"

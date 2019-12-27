@@ -43,7 +43,14 @@ readable format. That includes GeoIP information.
 Split the provided network using the specified prefix or netmask. That is,
 split up the network into smaller chunks of a specified prefix. When
 combined with no-decorate mode (\fB\-\-no\-decorate\fR), the split networks
-will be printed in raw form.
+will be printed in raw form. Example "ipcalc -S 26 192.168.1.0/24".
+
+.TP
+\fB\-d\fR, \fB\-\-deaggregate\fR
+Deaggregates the provided address range. That is, print the networks that
+cover the range. The range is given using the '-' separator, e.g.,
+"192.168.1.3-192.168.1.23". When combined with no-decorate mode
+(\fB\-\-no\-decorate\fR), the networks are printed in raw form.
 
 .TP
 \fB\-r\fR, \fB\-\-random-private\fR
