@@ -35,7 +35,6 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <errno.h>
 #include <time.h>		/* clock_gettime */
 #include "ipcalc.h"
 
@@ -59,49 +58,6 @@ static unsigned flags = 0;
   take host byte order or network byte order.  Most take host byte order, and
   return host byte order, but there are some exceptions.
 */
-
-static int safe_atoi(const char *s, int *ret_i)
-{
-	char *x = NULL;
-	long l;
-
-	errno = 0;
-	l = strtol(s, &x, 0);
-
-	if (!x || x == s || *x || errno)
-		return errno > 0 ? -errno : -EINVAL;
-
-	if ((long)(int)l != l)
-		return -ERANGE;
-
-	*ret_i = (int)l;
-	return 0;
-}
-
-/*!
-  \fn char safe_strdup(const char *s)
-  \brief strdup(3) that checks memory allocation or fail
-
-  This function does the same as strdup(3) with additional memory allocation
-  check.  When check fails the function will cause program to exit.
-
-  \param string to be duplicated
-  \return allocated duplicate
-*/
-extern char __attribute__((warn_unused_result)) *safe_strdup(const char *str)
-{
-	char *ret;
-
-	if (!str)
-		return NULL;
-
-	ret = strdup(str);
-	if (!ret) {
-		fprintf(stderr, "Memory allocation failure\n");
-		exit(1);
-	}
-	return ret;
-}
 
 /*!
   \fn uint32_t prefix2mask(int bits)

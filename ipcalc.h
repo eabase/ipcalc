@@ -20,8 +20,6 @@
 #ifndef _IPCALC_H
 #define _IPCALC_H
 
-int __attribute__((__format__(printf, 2, 3))) safe_asprintf(char **strp, const char *fmt, ...);
-
 #if defined(USE_GEOIP)
   void geo_ip_lookup(const char *ip, char **country, char **ccode, char **city, char  **coord);
   int geo_setup(void);
@@ -40,7 +38,9 @@ int __attribute__((__format__(printf, 2, 3))) safe_asprintf(char **strp, const c
 # define geo_setup() -1
 #endif
 
+int __attribute__((__format__(printf, 2, 3))) safe_asprintf(char **strp, const char *fmt, ...);
 char __attribute__((warn_unused_result)) *safe_strdup(const char *str);
+int safe_atoi(const char *s, int *ret_i);
 
 char *calc_reverse_dns4(struct in_addr ip, unsigned prefix, struct in_addr net, struct in_addr bcast);
 char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix);
