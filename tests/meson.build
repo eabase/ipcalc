@@ -36,6 +36,27 @@ test('Random-Info',
 		ipcalc.full_path() + ' -r 24 -i 127.0.0.1'
 	]
 )
+test('Random',
+	testrunner,
+	args : [
+		'--test-success',
+		ipcalc.full_path() + ' -r 24' + '|grep Address'
+	]
+)
+test('RandomIPv6Implicit',
+	testrunner,
+	args : [
+		'--test-success',
+		ipcalc.full_path() + ' -r 112' + '|grep Address'
+	]
+)
+test('RandomIPv6Explicit',
+	testrunner,
+	args : [
+		'--test-success',
+		ipcalc.full_path() + ' -6 -r 24' + '|grep Address'
+	]
+)
 test('HostnameIPv6Localhost',
 	testrunner,
 	args : [
