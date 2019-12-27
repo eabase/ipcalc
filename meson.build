@@ -1,13 +1,17 @@
 project('ipcalc', 'c',
 	license : 'GPLv2',
-	version : '0.3.0'
+	version : '0.4.0'
 )
 
 src = [
+	'ipcalc.h',
 	'ipcalc.c',
 	'ipcalc-reverse.c',
 	'ipcalc-utils.c',
-	'netsplit.c'
+	'netsplit.c',
+	'ipv6.h',
+	'ipv6.c',
+	'deaggregate.c'
 ]
 
 args = [

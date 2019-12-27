@@ -33,6 +33,7 @@
 #include <arpa/inet.h>
 #include <stdint.h>
 
+#include "ipv6.h"
 #include "ipcalc.h"
 
 static const char *numtoquad(uint32_t num)
@@ -130,26 +131,6 @@ static const char *ipv6tostr(struct in6_addr *ip)
 	return inet_ntop(AF_INET6, ip, str, sizeof(str));
 }
 
-static void v6add(struct in6_addr *a, const struct in6_addr *b)
-{
-	int i, j;
-	uint32_t tmp;
-
-	for (i = 15; i >= 0; i--) {
-		tmp = (uint32_t)a->s6_addr[i] + (uint32_t)b->s6_addr[i];
-		if (tmp > 0xff && i > 0) {
-			j = i - 1;
-			for (j=i-1;j>=0;j--) {
-				a->s6_addr[j]++;
-				if (a->s6_addr[j] != 0)
-					break;
-			}
-		}
-
-		a->s6_addr[i] = tmp & 0xff;
-	}
-}
-
 void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info, unsigned flags)
 {
 	int i, j, k;
@@ -213,7 +194,7 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 
 	memset(&tmpaddr, 0, sizeof(tmpaddr));
 	tmpaddr.s6_addr[15] = 1;
-	v6add(&sdiff, &tmpaddr);
+	ipv6_add(&sdiff, &tmpaddr);
 
 	output_start(&jsonchain);
 
@@ -227,7 +208,7 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 			printf("%s/%u\n", ipv6tostr(&start), split_prefix);
 		}
 
-		v6add(&start, &sdiff);
+		ipv6_add(&start, &sdiff);
 
 		j = 0;
 		for (k = 0; k < 16; k+=2)
@@ -251,8 +232,8 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 
 		memset(&end, 0, sizeof(end));
 
-		v6add(&end, &start);
-		v6add(&end, &ediff);
+		ipv6_add(&end, &start);
+		ipv6_add(&end, &ediff);
 		count++;
 	}
 

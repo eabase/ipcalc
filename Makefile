@@ -33,7 +33,7 @@ endif # not GEOIP
 
 all: ipcalc
 
-ipcalc: ipcalc.c ipcalc-geoip.c ipcalc-maxmind.c ipcalc-reverse.c ipcalc-utils.c netsplit.c
+ipcalc: ipcalc.c ipv6.c deaggregate.c ipcalc-geoip.c ipcalc-maxmind.c ipcalc-reverse.c ipcalc-utils.c netsplit.c
 	$(CC) $(CFLAGS) -DVERSION="\"$(VERSION)\"" $^ -o $@ $(LDFLAGS)
 
 clean:
