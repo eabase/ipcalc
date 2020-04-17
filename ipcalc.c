@@ -443,7 +443,7 @@ static const char *ipv4_net_to_type(struct in_addr net)
 		return "IETF Protocol Assignments";
 	}
 
-	if (byte1 == 192 && byte2 == 2 && byte3 == 0) {
+	if (byte1 == 192 && byte2 == 0 && byte3 == 2) {
 		return "Documentation (TEST-NET-1)";
 	}
 
@@ -738,7 +738,7 @@ static const char *ipv6_net_to_type(struct in6_addr *net, int prefix)
 	uint16_t word1 = net->s6_addr[0] << 8 | net->s6_addr[1];
 	uint16_t word2 = net->s6_addr[2] << 8 | net->s6_addr[3];
 
-	/* based on IANA's iana-ipv6-special-registry and ipv6-address-space 
+	/* based on IANA's iana-ipv6-special-registry and ipv6-address-space
 	 * Updated: 2019-09-13
 	 */
 	if (prefix == 128 && memcmp
