@@ -363,6 +363,30 @@ test('TestHumanReadableGenericInfoNoPrefix',
 		files('i-2a03:2880:20:4f06:face:b00c:0:1')
 	]
 )
+test('TestHumanReadableTestNet1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.2.1',
+		files('i-192.0.2.1')
+	]
+)
+test('TestHumanReadableTestNet2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 198.51.100.1',
+		files('i-198.51.100.1')
+	]
+)
+test('TestHumanReadableTestNet3',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 203.0.113.1',
+		files('i-203.0.113.1')
+	]
+)
 test('TestHumanReadableTranslat96',
 	testrunner,
 	args : [

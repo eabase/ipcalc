@@ -447,7 +447,7 @@ static const char *ipv4_net_to_type(struct in_addr net)
 		return "Documentation (TEST-NET-1)";
 	}
 
-	if (byte1 == 192 && byte2 == 51 && byte3 == 100) {
+	if (byte1 == 198 && byte2 == 51 && byte3 == 100) {
 		return "Documentation (TEST-NET-2)";
 	}
 
