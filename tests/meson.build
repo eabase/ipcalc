@@ -447,8 +447,64 @@ test('TestHumanReadableIETFProtocolAssignmentsIPv4',
 	testrunner,
 	args : [
 		'--test-outfile',
-		ipcalc.full_path() + ' -i 192.0.0.1',
-		files('i-192.0.0.1')
+		ipcalc.full_path() + ' -i 192.0.0.254',
+		files('i-192.0.0.254')
+	]
+)
+test('TestHumanReadableServiceContinuityPrefixIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.6',
+		files('i-192.0.0.6')
+	]
+)
+test('TestHumanReadableDummyAddressIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.8',
+		files('i-192.0.0.8')
+	]
+)
+test('TestHumanReadablePortControlProtocolAnycastIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.9',
+		files('i-192.0.0.9')
+	]
+)
+test('TestHumanReadableTraversalUsingRelaysAroundNATAnycast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.10',
+		files('i-192.0.0.10')
+	]
+)
+test('TestHumanReadableNAT64DNS64Discovery1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.170',
+		files('i-192.0.0.170')
+	]
+)
+test('TestHumanReadableNAT64DNS64Discovery2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.171',
+		files('i-192.0.0.171')
+	]
+)
+test('TestHumanReadableAS112v4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.31.196.1',
+		files('i-192.31.196.1')
 	]
 )
 test('TestHumanReadableDeprecated6to4RelayAnycast',
@@ -465,6 +521,14 @@ test('TestHumanReadableAMTIPv4',
 		'--test-outfile',
 		ipcalc.full_path() + ' -i 192.52.193.5',
 		files('i-192.52.193.5')
+	]
+)
+test('TestHumanReadableDirectDelegationAS112ServiceIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.175.48.12',
+		files('i-192.175.48.12')
 	]
 )
 test('TestHumanReadableTestNet1',
