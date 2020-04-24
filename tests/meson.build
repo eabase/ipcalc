@@ -1121,6 +1121,7 @@ test('LookupReverseDNSFromPrefix120IPv6',
 		'REVERSEDNS=3.4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.3.2.1.ip6.arpa.'
 	]
 )
+
 # specific info decorated & no-decorate test
 test('SpecificInfoOutput',
 	testrunner,
@@ -1138,6 +1139,8 @@ test('SpecificInfoOutputNoDecorate',
 		files('192.168.2.7')
 	]
 )
+
+# --json output tests
 test('JsonSplitPrefix24',
 	testrunner,
 	args : [
@@ -1226,6 +1229,8 @@ test('InfoImplicit',
 		files('info-192.168.2.7')
 	]
 )
+
+# --deagrregate tests
 test('DeaggregateNoDecorate',
 	testrunner,
 	args : [
