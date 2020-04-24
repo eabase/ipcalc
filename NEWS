@@ -1,5 +1,7 @@
 * Version 0.4.1 (unreleased)
-- Fix identification of TEST-NET-1.
+- Fix identification of TEST-NET-1 and TEST-NET-2.
+- Updated IANA IPv4 special purpose address registry to the
+  2020-04-06 version.
 
 
 * Version 0.4.0 (released 2019-12-28)
