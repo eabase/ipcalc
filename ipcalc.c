@@ -413,7 +413,7 @@ static const char *ipv4_net_to_type(struct in_addr net)
 	unsigned byte4 = (ntohl(net.s_addr)) & 0xff;
 
 	/* based on IANA's iana-ipv4-special-registry and ipv4-address-space
-	 * Updated: 2015-05-12
+	 * Updated: 2020-04-06
 	 */
 	if (byte1 == 0) {
 		return "This host on this network";
@@ -439,6 +439,26 @@ static const char *ipv4_net_to_type(struct in_addr net)
 		return "Private Use";
 	}
 
+	if (byte1 == 192 && byte2 == 0 && byte3 == 0 && byte4 <= 7) {
+		return "IPv4 Service Continuity Prefix";
+	}
+
+	if (byte1 == 192 && byte2 == 0 && byte3 == 0 && byte4 == 8) {
+		return "IPv4 dummy address";
+	}
+
+	if (byte1 == 192 && byte2 == 0 && byte3 == 0 && byte4 == 9) {
+		return "Port Control Protocol Anycast";
+	}
+
+	if (byte1 == 192 && byte2 == 0 && byte3 == 0 && byte4 == 10) {
+		return "Traversal Using Relays around NAT Anycast";
+	}
+
+	if (byte1 == 192 && byte2 == 0 && byte3 == 0 && (byte4 == 170 || byte4 == 171)) {
+		return "NAT64/DNS64 Discovery";
+	}
+
 	if (byte1 == 192 && byte2 == 0 && byte3 == 0) {
 		return "IETF Protocol Assignments";
 	}
@@ -447,7 +467,7 @@ static const char *ipv4_net_to_type(struct in_addr net)
 		return "Documentation (TEST-NET-1)";
 	}
 
-	if (byte1 == 192 && byte2 == 51 && byte3 == 100) {
+	if (byte1 == 198 && byte2 == 51 && byte3 == 100) {
 		return "Documentation (TEST-NET-2)";
 	}
 
@@ -459,12 +479,20 @@ static const char *ipv4_net_to_type(struct in_addr net)
 		return "6 to 4 Relay Anycast (Deprecated)";
 	}
 
+	if (byte1 == 192 && byte2 == 31 && byte3 == 196) {
+		return "AS112-v4";
+	}
+
 	if (byte1 == 192 && byte2 == 52 && byte3 == 193) {
 		return "AMT";
 	}
 
 	if (byte1 == 192 && byte2 == 168) {
 		return "Private Use";
+	}
+
+	if (byte1 == 192 && byte2 == 175 && byte3 == 48) {
+		return "Direct Delegation AS112 Service";
 	}
 
 	if (byte1 == 255 && byte2 == 255 && byte3 == 255 && byte4 == 255) {
