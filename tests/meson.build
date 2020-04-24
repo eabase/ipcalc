@@ -363,6 +363,262 @@ test('TestHumanReadableGenericInfoNoPrefix',
 		files('i-2a03:2880:20:4f06:face:b00c:0:1')
 	]
 )
+test('TestHumanReadableGenericInfoInternetIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 3.130.45.15',
+		files('i-3.130.45.15')
+	]
+)
+test('TestHumanReadableHostOnThisNetwork',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 0.0.0.1',
+		files('i-0.0.0.1')
+	]
+)
+test('TestHumanReadablePrivateUse1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 10.0.0.1',
+		files('i-10.0.0.1')
+	]
+)
+test('TestHumanReadablePrivateUse2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 172.16.0.1',
+		files('i-172.16.0.1')
+	]
+)
+test('TestHumanReadablePrivateUse3',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 172.31.255.254',
+		files('i-172.31.255.254')
+	]
+)
+test('TestHumanReadablePrivateUse4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.168.0.1',
+		files('i-192.168.0.1')
+	]
+)
+test('TestHumanReadableSharedAddressSpace',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 100.64.0.1',
+		files('i-100.64.0.1')
+	]
+)
+test('TestHumanReadableLoopback',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 127.0.0.1',
+		files('i-127.0.0.1')
+	]
+)
+test('TestHumanReadableLoopback2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 127.0.1.1',
+		files('i-127.0.1.1')
+	]
+)
+test('TestHumanReadableLinkLocal',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 169.254.0.1',
+		files('i-169.254.0.1')
+	]
+)
+test('TestHumanReadableIETFProtocolAssignmentsIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.254',
+		files('i-192.0.0.254')
+	]
+)
+test('TestHumanReadableServiceContinuityPrefixIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.6',
+		files('i-192.0.0.6')
+	]
+)
+test('TestHumanReadableDummyAddressIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.8',
+		files('i-192.0.0.8')
+	]
+)
+test('TestHumanReadablePortControlProtocolAnycastIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.9',
+		files('i-192.0.0.9')
+	]
+)
+test('TestHumanReadableTraversalUsingRelaysAroundNATAnycast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.10',
+		files('i-192.0.0.10')
+	]
+)
+test('TestHumanReadableNAT64DNS64Discovery1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.170',
+		files('i-192.0.0.170')
+	]
+)
+test('TestHumanReadableNAT64DNS64Discovery2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.0.171',
+		files('i-192.0.0.171')
+	]
+)
+test('TestHumanReadableAS112v4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.31.196.1',
+		files('i-192.31.196.1')
+	]
+)
+test('TestHumanReadableDeprecated6to4RelayAnycast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.88.99.1',
+		files('i-192.88.99.1')
+	]
+)
+test('TestHumanReadableAMTIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.52.193.5',
+		files('i-192.52.193.5')
+	]
+)
+test('TestHumanReadableDirectDelegationAS112ServiceIPv4',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.175.48.12',
+		files('i-192.175.48.12')
+	]
+)
+test('TestHumanReadableTestNet1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 192.0.2.1',
+		files('i-192.0.2.1')
+	]
+)
+test('TestHumanReadableTestNet2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 198.51.100.1',
+		files('i-198.51.100.1')
+	]
+)
+test('TestHumanReadableTestNet3',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 203.0.113.1',
+		files('i-203.0.113.1')
+	]
+)
+test('TestHumanReadableBenchmarking1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 198.18.0.1',
+		files('i-198.18.0.1')
+	]
+)
+test('TestHumanReadableBenchmarking2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 198.19.201.71',
+		files('i-198.19.201.71')
+	]
+)
+test('TestHumanReadableBenchmarking3',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 198.19.255.254',
+		files('i-198.19.255.254')
+	]
+)
+test('TestHumanReadableMulticast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 224.0.0.1',
+		files('i-224.0.0.1')
+	]
+)
+test('TestHumanReadableReserved1',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 240.0.0.1',
+		files('i-240.0.0.1')
+	]
+)
+test('TestHumanReadableReserved2',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 250.7.93.1',
+		files('i-250.7.93.1')
+	]
+)
+test('TestHumanReadableReserved3',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 255.255.255.254',
+		files('i-255.255.255.254')
+	]
+)
+test('TestHumanReadableLimitedBroadcast',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -i 255.255.255.255',
+		files('i-255.255.255.255')
+	]
+)
 test('TestHumanReadableTranslat96',
 	testrunner,
 	args : [
@@ -865,6 +1121,7 @@ test('LookupReverseDNSFromPrefix120IPv6',
 		'REVERSEDNS=3.4.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.4.3.2.1.ip6.arpa.'
 	]
 )
+
 # specific info decorated & no-decorate test
 test('SpecificInfoOutput',
 	testrunner,
@@ -882,6 +1139,8 @@ test('SpecificInfoOutputNoDecorate',
 		files('192.168.2.7')
 	]
 )
+
+# --json output tests
 test('JsonSplitPrefix24',
 	testrunner,
 	args : [
@@ -970,6 +1229,8 @@ test('InfoImplicit',
 		files('info-192.168.2.7')
 	]
 )
+
+# --deagrregate tests
 test('DeaggregateNoDecorate',
 	testrunner,
 	args : [
