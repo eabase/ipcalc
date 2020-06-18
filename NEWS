@@ -1,3 +1,7 @@
+* Version 0.4.2 (unreleased)
+- Manpage was converted to markdown
+
+
 * Version 0.4.1 (released 2020-04-24)
 - Fix identification of TEST-NET-1 and TEST-NET-2.
 - Updated IANA IPv4 special purpose address registry to the

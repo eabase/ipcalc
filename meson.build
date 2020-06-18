@@ -71,6 +71,17 @@ ipcalc = executable('ipcalc',
 	dependencies : deps,
 	install : true
 )
-install_man('ipcalc.1')
+
+ronn = find_program('ronn', required: true)
+
+ipcalc_1 = custom_target(
+	'ipcalc.1',
+	output : 'ipcalc.1',
+	input : 'ipcalc.1.md',
+	command : [ronn, '--pipe', '-r', '@INPUT@'],
+	capture: true,
+	install_dir: join_paths(get_option('mandir'), 'man1'),
+	install: true
+)
 
 subdir('tests')
