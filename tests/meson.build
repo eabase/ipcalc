@@ -96,7 +96,7 @@ test('IPIPv6Localhost',
 		files('ip-localhost-ipv6')
 	]
 )
-test('HostnameIPv4Localhost',
+test('IPIPv4Localhost',
 	testrunner,
 	args : [
 		'--test-outfile',
@@ -104,7 +104,7 @@ test('HostnameIPv4Localhost',
 		files('ip-localhost-ipv4')
 	]
 )
-test('HostnameIPv4LocalhostJson',
+test('IPIPv4LocalhostJson',
 	testrunner,
 	args : [
 		'--test-outfile',

@@ -1780,6 +1780,9 @@ int main(int argc, char **argv)
 				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
 
 		} else {
+			if (info.hostname)
+				default_printf(&jsonchain, "Hostname:\t", HOSTNAME_NAME, "%s", info.hostname);
+
 			if (info.type)
 				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
