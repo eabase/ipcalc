@@ -1137,6 +1137,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "Usage: ipcalc [OPTION...]\n");
 		fprintf(stderr, "  -c, --check                     Validate IP address\n");
 		fprintf(stderr, "  -r, --random-private=PREFIX     Generate a random private IP network using\n");
+		fprintf(stderr, "                                  the supplied prefix or mask.\n");
 		fprintf(stderr, "  -S, --split=PREFIX              Split the provided network using the\n");
 		fprintf(stderr, "                                  provided prefix/netmask\n");
 		fprintf(stderr, "  -d, --deagrregate=IP1-IP2       Deaggregate the provided address range\n");
