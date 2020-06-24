@@ -45,6 +45,8 @@ $ meson setup build `-Duse_maxminddb=disabled -Duse_geoip=disabled`
 $ ninja -C build
 ```
 
+To generate the manpage the ronn application is necessary.
+
 ## Optimizing the build
 
 By default Meson optimizes for the most common type of build: those done by
