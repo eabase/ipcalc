@@ -1,6 +1,6 @@
 project('ipcalc', 'c',
 	license : 'GPLv2',
-	version : '0.4.1'
+	version : '1.0.0'
 )
 
 src = [
