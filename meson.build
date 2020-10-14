@@ -72,16 +72,17 @@ ipcalc = executable('ipcalc',
 	install : true
 )
 
-ronn = find_program('ronn', required: true)
-
-ipcalc_1 = custom_target(
-	'ipcalc.1',
-	output : 'ipcalc.1',
-	input : 'ipcalc.1.md',
-	command : [ronn, '--pipe', '-r', '@INPUT@'],
-	capture: true,
-	install_dir: join_paths(get_option('mandir'), 'man1'),
-	install: true
-)
+ronn = find_program('ronn', required: false)
+if ronn.found()
+	ipcalc_1 = custom_target(
+		'ipcalc.1',
+		output : 'ipcalc.1',
+		input : 'ipcalc.1.md',
+		command : [ronn, '--pipe', '-r', '@INPUT@'],
+		capture: true,
+		install_dir: join_paths(get_option('mandir'), 'man1'),
+		install: true
+	)
+endif
 
 subdir('tests')
