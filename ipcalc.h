@@ -20,6 +20,8 @@
 #ifndef _IPCALC_H
 #define _IPCALC_H
 
+#include <stdarg.h> /* for va_list */
+
 #if defined(USE_GEOIP)
   void geo_ip_lookup(const char *ip, char **country, char **ccode, char **city, char  **coord);
   int geo_setup(void);
