@@ -1,3 +1,7 @@
+* Version 1.0.1 (unreleased)
+- The application will now build even without ronn
+
+
 * Version 1.0.0 (released 2020-10-03)
 - Manpage was converted to markdown
 
