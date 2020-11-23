@@ -5,7 +5,8 @@ stages:
 .fedora.latest.template: &fedora_template
   image: fedora:latest
   before_script:
-    - dnf install -y GeoIP-devel libmaxminddb-devel make meson ninja-build gcc libasan geolite2-{city,country} rubygem-ronn-ng
+#in F34 rubygem-ronn got replaced by rubygem-ronn-ng
+    - dnf install -y GeoIP-devel libmaxminddb-devel make meson ninja-build gcc libasan geolite2-{city,country} rubygem-ronn
 
 fedora.nogeo:
   stage: generate
