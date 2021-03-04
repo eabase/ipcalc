@@ -1140,7 +1140,7 @@ void usage(unsigned verbose)
 		fprintf(stderr, "                                  the supplied prefix or mask.\n");
 		fprintf(stderr, "  -S, --split=PREFIX              Split the provided network using the\n");
 		fprintf(stderr, "                                  provided prefix/netmask\n");
-		fprintf(stderr, "  -d, --deagrregate=IP1-IP2       Deaggregate the provided address range\n");
+		fprintf(stderr, "  -d, --deaggregate=IP1-IP2       Deaggregate the provided address range\n");
 		fprintf(stderr, "  -i, --info                      Print information on the provided IP address\n");
 		fprintf(stderr, "                                  (default)\n");
 		fprintf(stderr, "      --all-info                  Print verbose information on the provided IP\n");
