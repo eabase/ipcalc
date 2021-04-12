@@ -1735,7 +1735,10 @@ int main(int argc, char **argv)
 			default_printf(&jsonchain, "Address:\t", ADDRESS_NAME, "%s", info.ip);
 		}
 
-		if (!single_host) {
+		if (single_host && info.hostname)
+			default_printf(&jsonchain, "Hostname:\t", HOSTNAME_NAME, "%s", info.hostname);
+
+		if (!single_host || (flags & FLAG_JSON)) {
 			if (! (flags & FLAG_JSON)) {
 				if (info.expanded_network) {
 					default_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s/%u", info.expanded_network, info.prefix);
@@ -1760,7 +1763,7 @@ int main(int argc, char **argv)
 		if ((flags & FLAG_SHOW_ALL_INFO) && info.reverse_dns)
 			default_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
 
-		if (!single_host) {
+		if (!single_host || (flags & FLAG_JSON)) {
 			output_separate(&jsonchain);
 
 			if (info.type)
@@ -1781,8 +1784,6 @@ int main(int argc, char **argv)
 				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
 
 		} else {
-			if (info.hostname)
-				default_printf(&jsonchain, "Hostname:\t", HOSTNAME_NAME, "%s", info.hostname);
 
 			if (info.type)
 				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
