@@ -560,12 +560,10 @@ unsigned default_ipv4_prefix(struct in_addr net)
 
 char *ipv4_prefix_to_hosts(char *hosts, unsigned hosts_size, unsigned prefix)
 {
-	unsigned tmp;
-
 	if (prefix >= 31) {
 		snprintf(hosts, hosts_size, "%s", p2_table(32 - prefix));
 	} else {
-		tmp = (1 << (32 - prefix)) - 2;
+		unsigned tmp = (1 << (32 - prefix)) - 2;
 		snprintf(hosts, hosts_size, "%u", tmp);
 	}
 	return hosts;
@@ -1067,11 +1065,11 @@ static char *generate_ip_network(unsigned prefix, unsigned flags)
 static
 int str_to_prefix(unsigned *flags, const char *prefixStr, unsigned fix)
 {
-	int prefix = -1, r;
+	int prefix = -1;
 	if (!((*flags) & FLAG_IPV6) && strchr(prefixStr, '.')) {	/* prefix is 255.x.x.x */
 		prefix = ipv4_mask_to_int(prefixStr);
 	} else {
-		r = safe_atoi(prefixStr, &prefix);
+		int r = safe_atoi(prefixStr, &prefix);
 		if (r != 0) {
 			return -1;
 		}
@@ -1389,12 +1387,11 @@ int main(int argc, char **argv)
 	int prefix = -1, splitPrefix = -1;
 	ip_info_st info;
 	int r = 0;
-	int c;
 	unsigned jsonchain = JSON_FIRST;
 	enum app_t app = 0;
 
 	while (1) {
-		c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsvd:", long_options, NULL);
+		int c = getopt_long(argc, argv, "S:cr:i46abho:gmnpjsvd:", long_options, NULL);
 		if (c == -1)
 			break;
 
