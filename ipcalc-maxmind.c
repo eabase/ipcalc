@@ -130,7 +130,7 @@ void geo_ip_lookup(const char *ip, char **country, char **ccode, char **city, ch
     MMDB_s mmdb;
     MMDB_entry_data_s entry_data;
     int gai_error, mmdb_error, status, coordinates=0;
-    double latitude, longitude;
+    double latitude = 0, longitude = 0;
 
     if (geo_setup() != 0)
         return;
