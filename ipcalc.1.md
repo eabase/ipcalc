@@ -229,7 +229,7 @@ localhost
 
 ## Authors
 ```
-    Nikos Mavrogiannopoulos <nmav@redhat.com>
+    Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
     Erik Troan <ewt@redhat.com>
     Preston Brown <pbrown@redhat.com>
     David Cantrell <dcantrell@redhat.com>
