@@ -57,6 +57,13 @@ test('RandomIPv6Implicit',
 		ipcalc.full_path() + ' -r 112' + '|grep Address'
 	]
 )
+test('RandomIPv6PrefixIsValidULA',
+	testrunner,
+	args : [
+		'--test-success',
+		ipcalc.full_path() + ' -6 -r 48 -a' + '|grep ^ADDRESS=fd'
+	]
+)
 test('RandomIPv6Explicit',
 	testrunner,
 	args : [

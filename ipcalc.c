@@ -1023,8 +1023,7 @@ static char *generate_ip_network(unsigned prefix, unsigned flags)
 	if (flags & FLAG_IPV6) {
 		struct in6_addr net;
 
-		net.s6_addr[0] = 0xfc;
-		net.s6_addr[0] |= ts.tv_nsec & 1;
+		net.s6_addr[0] = 0xfd;
 		if (randomize(&net.s6_addr[1], 15) < 0)
 			return NULL;
 
