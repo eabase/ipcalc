@@ -137,103 +137,93 @@ a netmask or a CIDR prefix as well.
 ## Examples
 
 ### Display all information of an IPv4
-```
-$ ipcalc --all-info 193.92.150.2/24
-Address:        193.92.150.2
-Network:        193.92.150.0/24
-Netmask:        255.255.255.0 = 24
-Broadcast:      193.92.150.255
-Reverse DNS:    150.92.193.in-addr.arpa.
 
-Address space:  Internet
-Address class:  Class C
-HostMin:        193.92.150.1
-HostMax:        193.92.150.254
-Hosts/Net:      254
+    $ ipcalc --all-info 193.92.150.2/24
+    Address:        193.92.150.2
+    Network:        193.92.150.0/24
+    Netmask:        255.255.255.0 = 24
+    Broadcast:      193.92.150.255
+    Reverse DNS:    150.92.193.in-addr.arpa.
 
-Country code:   GR
-Country:        Greece
-```
+    Address space:  Internet
+    Address class:  Class C
+    HostMin:        193.92.150.1
+    HostMax:        193.92.150.254
+    Hosts/Net:      254
+    
+    Country code:   GR
+    Country:        Greece
 
 ### Display information in key-value format
-```
-$ ipcalc -pnmb --minaddr --maxaddr --geoinfo --addrspace 193.92.150.2/255.255.255.224
-NETMASK=255.255.255.224
-PREFIX=27
-BROADCAST=193.92.150.31
-NETWORK=193.92.150.0
-MINADDR=193.92.150.1
-MAXADDR=193.92.150.30
-ADDRSPACE="Internet"
-COUNTRY="Greece"
-```
+
+    $ ipcalc -pnmb --minaddr --maxaddr --geoinfo --addrspace 193.92.150.2/255.255.255.224
+    NETMASK=255.255.255.224
+    PREFIX=27
+    BROADCAST=193.92.150.31
+    NETWORK=193.92.150.0
+    MINADDR=193.92.150.1
+    MAXADDR=193.92.150.30
+    ADDRSPACE="Internet"
+    COUNTRY="Greece"
 
 ### Display all information of an IPv6
-```
-$ ipcalc --all-info 2a03:2880:20:4f06:face:b00c:0:14/64
-Full Address:   2a03:2880:0020:4f06:face:b00c:0000:0014
-Address:        2a03:2880:20:4f06:face:b00c:0:14
-Full Network:   2a03:2880:0020:4f06:0000:0000:0000:0000/64
-Network:        2a03:2880:20:4f06::/64
-Netmask:        ffff:ffff:ffff:ffff:: = 64
-Reverse DNS:    6.0.f.4.0.2.0.0.0.8.8.2.3.0.a.2.ip6.arpa.
 
-Address space:  Global Unicast
-HostMin:        2a03:2880:20:4f06::
-HostMax:        2a03:2880:20:4f06:ffff:ffff:ffff:ffff
-Hosts/Net:      2^(64) = 18446744073709551616
-
-Country code:   IE
-Country:        Ireland
-```
+    $ ipcalc --all-info 2a03:2880:20:4f06:face:b00c:0:14/64
+    Full Address:   2a03:2880:0020:4f06:face:b00c:0000:0014
+    Address:        2a03:2880:20:4f06:face:b00c:0:14
+    Full Network:   2a03:2880:0020:4f06:0000:0000:0000:0000/64
+    Network:        2a03:2880:20:4f06::/64
+    Netmask:        ffff:ffff:ffff:ffff:: = 64
+    Reverse DNS:    6.0.f.4.0.2.0.0.0.8.8.2.3.0.a.2.ip6.arpa.
+    
+    Address space:  Global Unicast
+    HostMin:        2a03:2880:20:4f06::
+    HostMax:        2a03:2880:20:4f06:ffff:ffff:ffff:ffff
+    Hosts/Net:      2^(64) = 18446744073709551616
+    
+    Country code:   IE
+    Country:        Ireland
 
 ### Display JSON output
 
-```
-$ ipcalc --all-info -j 2a03:2880:20:4f06:face:b00c:0:14/64
-{
-  "FULLADDRESS":"2a03:2880:0020:4f06:face:b00c:0000:0014",
-  "ADDRESS":"2a03:2880:20:4f06:face:b00c:0:14",
-  "FULLNETWORK":"2a03:2880:0020:4f06:0000:0000:0000:0000",
-  "NETWORK":"2a03:2880:20:4f06::",
-  "NETMASK":"ffff:ffff:ffff:ffff::",
-  "PREFIX":"64",
-  "REVERSEDNS":"6.0.f.4.0.2.0.0.0.8.8.2.3.0.a.2.ip6.arpa.",
-  "ADDRSPACE":"Global Unicast",
-  "MINADDR":"2a03:2880:20:4f06::",
-  "MAXADDR":"2a03:2880:20:4f06:ffff:ffff:ffff:ffff",
-  "ADDRESSES":"18446744073709551616",
-  "COUNTRYCODE":"IE",
-  "COUNTRY":"Ireland",
-  "COORDINATES":"53.000000,-8.000000"
-}
-```
+    $ ipcalc --all-info -j 2a03:2880:20:4f06:face:b00c:0:14/64
+    {
+      "FULLADDRESS":"2a03:2880:0020:4f06:face:b00c:0000:0014",
+      "ADDRESS":"2a03:2880:20:4f06:face:b00c:0:14",
+      "FULLNETWORK":"2a03:2880:0020:4f06:0000:0000:0000:0000",
+      "NETWORK":"2a03:2880:20:4f06::",
+      "NETMASK":"ffff:ffff:ffff:ffff::",
+      "PREFIX":"64",
+      "REVERSEDNS":"6.0.f.4.0.2.0.0.0.8.8.2.3.0.a.2.ip6.arpa.",
+      "ADDRSPACE":"Global Unicast",
+      "MINADDR":"2a03:2880:20:4f06::",
+      "MAXADDR":"2a03:2880:20:4f06:ffff:ffff:ffff:ffff",
+      "ADDRESSES":"18446744073709551616",
+      "COUNTRYCODE":"IE",
+      "COUNTRY":"Ireland",
+      "COORDINATES":"53.000000,-8.000000"
+    }
 
 ### Lookup of a hostname
-```
-$ ipcalc --lookup-host localhost --no-decorate
-::1
-```
+
+    $ ipcalc --lookup-host localhost --no-decorate
+    ::1
 
 ### IPv4 lookup of a hostname
-```
-$ ipcalc --lookup-host localhost --no-decorate -4
-127.0.0.1
-```
+
+    $ ipcalc --lookup-host localhost --no-decorate -4
+    127.0.0.1
 
 ### Reverse lookup of a hostname
-```
-$ ipcalc -h 127.0.0.1 --no-decorate
-localhost
-```
+
+    $ ipcalc -h 127.0.0.1 --no-decorate
+    localhost
 
 ## Authors
-```
-    Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
-    Erik Troan <ewt@redhat.com>
-    Preston Brown <pbrown@redhat.com>
-    David Cantrell <dcantrell@redhat.com>
-```
+* Nikos Mavrogiannopoulos <n.mavrogiannopoulos@gmail.com>
+* Erik Troan <ewt@redhat.com>
+* Preston Brown <pbrown@redhat.com>
+* David Cantrell <dcantrell@redhat.com>
 
 ## Reporting Bugs
 
