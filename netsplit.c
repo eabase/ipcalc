@@ -184,8 +184,7 @@ void show_split_networks_v6(unsigned split_prefix, const struct ip_info_st *info
 	memset(&ediff, 0, sizeof(ediff));
 
 	for (i = 0; i < 16; i++) {
-		if (splitmask.s6_addr)
-			sdiff.s6_addr[i] = 0xff - splitmask.s6_addr[i];
+		sdiff.s6_addr[i] = 0xff - splitmask.s6_addr[i];
 		end.s6_addr[i] = net.s6_addr[i] + sdiff.s6_addr[i];
 	}
 
