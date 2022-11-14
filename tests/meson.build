@@ -761,7 +761,7 @@ test('SplitLinesByNetworkIPv4',
 	testrunner,
 	args : [
 		'--test-equal',
-		ipcalc.full_path() + ' -S 29 192.168.5.0/24 | grep ^Network | wc -l',
+		ipcalc.full_path() + ' -S 29 192.168.5.0/24 | grep ^Network | wc -l | tr -d [:space:]',
 		ipcalc.full_path() + ' -S 29 192.168.5.0/24 | grep ^Total | cut -d: -f 2 | tr -d [:space:]'
 	]
 )
@@ -769,7 +769,7 @@ test('SplitLinesByNetworkIPv6',
 	testrunner,
 	args : [
 		'--test-equal',
-		ipcalc.full_path() + ' -S 120 fcfa:b4ca:f1d8:125b:dc00::/112 | grep ^Network | wc -l',
+		ipcalc.full_path() + ' -S 120 fcfa:b4ca:f1d8:125b:dc00::/112 | grep ^Network | wc -l | tr -d [:space:]',
 		ipcalc.full_path() + ' -S 120 fcfa:b4ca:f1d8:125b:dc00::/112 | grep ^Total|cut -d: -f 2 | tr -d [:space:]'
 	]
 )
