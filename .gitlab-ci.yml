@@ -72,6 +72,8 @@ pages-test:
     - ninja -C build
     - ninja -C build test
     - ninja -C build coverage-html && mv build/meson-logs/coveragereport public
+
+
   tags:
   - shared
   except:
@@ -86,6 +88,7 @@ pages:
     - ninja -C build
     - ninja -C build test
     - ninja -C build coverage-html && mv build/meson-logs/coveragereport public
+    - cat public/index.html|grep headerCovTableEntry|grep "%"|head -1|sed 's/^.*>\([0-9\.\ %]*\)<.*$/coverage lines: \1/' || true
   tags:
   - shared
   artifacts:
