@@ -1,4 +1,4 @@
-* Version 1.0.2 (unreleased)
+* Version 1.0.2 (released 2022-11-26)
 - Fix ULA prefix generator to use only defined ULA range
 - Corrected manpage generation
 
