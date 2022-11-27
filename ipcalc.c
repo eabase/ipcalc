@@ -1310,6 +1310,55 @@ void va_json_printf(unsigned * const jsonfirst, const char *jsontitle, const cha
 	return;
 }
 
+/* Always prints "title: value", will not color if --no-decorate is given
+ */
+static void
+__attribute__ ((format(printf, 4, 5)))
+pretty_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	if (flags & FLAG_JSON) {
+		va_json_printf(jsonfirst, jsontitle, fmt, args);
+	} else if (flags & FLAG_NO_DECORATE) {
+		fputs(title, stdout);
+		vprintf(fmt, args);
+		fputs("\n", stdout);
+	} else {
+		va_color_printf(KBLUE, title, fmt, args);
+	}
+	va_end(args);
+
+	return;
+}
+
+/* Always prints "title: value", will not color if --no-decorate is given
+ * To be used for distinct values (e.g., a summary).
+ */
+static void
+__attribute__ ((format(printf, 4, 5)))
+pretty_dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+	if (flags & FLAG_JSON) {
+		va_json_printf(jsonfirst, jsontitle, fmt, args);
+	} else if (flags & FLAG_NO_DECORATE) {
+		fputs(title, stdout);
+		vprintf(fmt, args);
+		fputs("\n", stdout);
+	} else {
+		va_color_printf(KMAG, title, fmt, args);
+	}
+	va_end(args);
+
+	return;
+}
+
+/* Prints "title: value", will only print value if --no-decorate is given
+ */
 void
 __attribute__ ((format(printf, 4, 5)))
 default_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
@@ -1330,6 +1379,9 @@ default_printf(unsigned * const jsonfirst, const char *title, const char *jsonti
 	return;
 }
 
+/* Prints "title: value", will only print value if --no-decorate is given. It
+ * prints a distinct value (e.g., to be used for a summary).
+ */
 void
 __attribute__ ((format(printf, 4, 5)))
 dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle, const char *fmt, ...)
@@ -1729,79 +1781,79 @@ int main(int argc, char **argv)
 		if ((!randomStr || single_host) &&
 		    (single_host || strcmp(info.network, info.ip) != 0)) {
 			if (info.expanded_ip) {
-				default_printf(&jsonchain,"Full Address:\t", FULL_ADDRESS_NAME, "%s", info.expanded_ip);
+				pretty_printf(&jsonchain,"Full Address:\t", FULL_ADDRESS_NAME, "%s", info.expanded_ip);
 			}
-			default_printf(&jsonchain, "Address:\t", ADDRESS_NAME, "%s", info.ip);
+			pretty_printf(&jsonchain, "Address:\t", ADDRESS_NAME, "%s", info.ip);
 		}
 
 		if (single_host && info.hostname)
-			default_printf(&jsonchain, "Hostname:\t", HOSTNAME_NAME, "%s", info.hostname);
+			pretty_printf(&jsonchain, "Hostname:\t", HOSTNAME_NAME, "%s", info.hostname);
 
 		if (!single_host || (flags & FLAG_JSON)) {
 			if (! (flags & FLAG_JSON)) {
 				if (info.expanded_network) {
-					default_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s/%u", info.expanded_network, info.prefix);
+					pretty_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s/%u", info.expanded_network, info.prefix);
 				}
-				default_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s/%u", info.network, info.prefix);
-				default_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s = %u", info.netmask, info.prefix);
+				pretty_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s/%u", info.network, info.prefix);
+				pretty_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s = %u", info.netmask, info.prefix);
 			}
 			else {
 				if (info.expanded_network) {
-					default_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s", info.expanded_network);
+					pretty_printf(&jsonchain, "Full Network:\t", FULL_NETWORK_NAME, "%s", info.expanded_network);
 				}
-				default_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s", info.network);
-				default_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s", info.netmask);
-				default_printf(&jsonchain, "Prefix:\t", PREFIX_NAME, "%u", info.prefix);
+				pretty_printf(&jsonchain, "Network:\t", NETWORK_NAME, "%s", info.network);
+				pretty_printf(&jsonchain, "Netmask:\t", NETMASK_NAME, "%s", info.netmask);
+				pretty_printf(&jsonchain, "Prefix:\t", PREFIX_NAME, "%u", info.prefix);
 			}
 
 
 			if (info.broadcast)
-				default_printf(&jsonchain, "Broadcast:\t", BROADCAST_NAME, "%s", info.broadcast);
+				pretty_printf(&jsonchain, "Broadcast:\t", BROADCAST_NAME, "%s", info.broadcast);
 		}
 
 		if ((flags & FLAG_SHOW_ALL_INFO) && info.reverse_dns)
-			default_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
+			pretty_printf(&jsonchain, "Reverse DNS:\t", REVERSEDNS_NAME, "%s", info.reverse_dns);
 
 		if (!single_host || (flags & FLAG_JSON)) {
 			output_separate(&jsonchain);
 
 			if (info.type)
-				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
+				pretty_dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
 			if ((flags & FLAG_SHOW_ALL_INFO) && info.class)
-				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
+				pretty_dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 
 			if (info.hostmin)
-				default_printf(&jsonchain, "HostMin:\t", MINADDR_NAME, "%s", info.hostmin);
+				pretty_printf(&jsonchain, "HostMin:\t", MINADDR_NAME, "%s", info.hostmin);
 
 			if (info.hostmax)
-				default_printf(&jsonchain, "HostMax:\t", MAXADDR_NAME, "%s", info.hostmax);
+				pretty_printf(&jsonchain, "HostMax:\t", MAXADDR_NAME, "%s", info.hostmax);
 
 			if ((flags & FLAG_IPV6) && info.prefix < 112 && !(flags & FLAG_JSON))
-				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "2^(%u) = %s", 128-info.prefix, info.hosts);
+				pretty_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "2^(%u) = %s", 128-info.prefix, info.hosts);
 			else
-				default_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
+				pretty_printf(&jsonchain, "Hosts/Net:\t", ADDRESSES_NAME, "%s", info.hosts);
 
 		} else {
 
 			if (info.type)
-				dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
+				pretty_dist_printf(&jsonchain, "Address space:\t", ADDRSPACE_NAME, "%s", info.type);
 
 			if ((flags & FLAG_SHOW_ALL_INFO) && info.class)
-				dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
+				pretty_dist_printf(&jsonchain, "Address class:\t", ADDRCLASS_NAME, "%s", info.class);
 		}
 
 		if (info.geoip_country || info.geoip_city || info.geoip_coord) {
 			output_separate(&jsonchain);
 
 			if (info.geoip_ccode)
-				dist_printf(&jsonchain, "Country code:\t", COUNTRYCODE_NAME, "%s", info.geoip_ccode);
+				pretty_dist_printf(&jsonchain, "Country code:\t", COUNTRYCODE_NAME, "%s", info.geoip_ccode);
 			if (info.geoip_country)
-				dist_printf(&jsonchain, "Country:\t", COUNTRY_NAME, "%s", info.geoip_country);
+				pretty_dist_printf(&jsonchain, "Country:\t", COUNTRY_NAME, "%s", info.geoip_country);
 			if (info.geoip_city)
-				dist_printf(&jsonchain, "City:\t\t", CITY_NAME, "%s", info.geoip_city);
+				pretty_dist_printf(&jsonchain, "City:\t\t", CITY_NAME, "%s", info.geoip_city);
 			if (info.geoip_coord)
-				dist_printf(&jsonchain, "Coordinates:\t", COORDINATES_NAME, "%s", info.geoip_coord);
+				pretty_dist_printf(&jsonchain, "Coordinates:\t", COORDINATES_NAME, "%s", info.geoip_coord);
 		}
 
 		output_stop(&jsonchain);

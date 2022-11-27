@@ -1294,6 +1294,27 @@ test('DeaggregateIPv6Json',
 		files('deaggregate-fcd3:57d1:733:c18f:b498:25e1:788:f-fcd3:57d1:733:c18f:b498:25e1:789:ffa9')
 	]
 )
+test('StandardInfo',
+	testrunner,
+	args :	[	'--test-outfile',
+			ipcalc.full_path() + ' 192.168.2.0/24',
+			files('standard-192.168.2.0-24')
+	]
+)
+test('NoDecorateInfo',
+	testrunner,
+	args :	[	'--test-outfile',
+			ipcalc.full_path() + ' --no-decorate 192.168.2.0/24',
+			files('no-decorate-192.168.2.0-24')
+	]
+)
+test('NoDecorateAllInfo',
+	testrunner,
+	args :	[	'--test-outfile',
+			ipcalc.full_path() + ' --all-info --no-decorate 192.168.2.0/24',
+			files('no-decorate-all-info-192.168.2.0-24')
+	]
+)
 # Test whether we can deaggregate a randomly generated network
 test('DeaggregateIPv6Random',
 	find_program('ipcalc-delegate-ipv6-random.sh'),
