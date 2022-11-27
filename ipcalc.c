@@ -1317,11 +1317,11 @@ default_printf(unsigned * const jsonfirst, const char *title, const char *jsonti
 	va_list args;
 
 	va_start(args, fmt);
-	if (flags & FLAG_NO_DECORATE) {
+	if (flags & FLAG_JSON) {
+		va_json_printf(jsonfirst, jsontitle, fmt, args);
+	} else if (flags & FLAG_NO_DECORATE) {
 		vprintf(fmt, args);
 		printf("\n");
-	} else if (flags & FLAG_JSON) {
-		va_json_printf(jsonfirst, jsontitle, fmt, args);
 	} else {
 		va_color_printf(KBLUE, title, fmt, args);
 	}
@@ -1340,7 +1340,10 @@ dist_printf(unsigned * const jsonfirst, const char *title, const char *jsontitle
 	if (flags & FLAG_JSON) {
 		va_json_printf(jsonfirst, jsontitle, fmt, args);
 	}
-	else {
+	else if (flags & FLAG_NO_DECORATE) {
+		vprintf(fmt, args);
+		printf("\n");
+	} else {
 		va_color_printf(KMAG, title, fmt, args);
 	}
 	va_end(args);
