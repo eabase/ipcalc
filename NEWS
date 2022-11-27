@@ -1,3 +1,8 @@
+* Version 1.0.3 (unreleased)
+- When --no-decorate is given the default output will
+  include no colors (#28)
+
+
 * Version 1.0.2 (released 2022-11-26)
 - Fix ULA prefix generator to use only defined ULA range
 - Corrected manpage generation
