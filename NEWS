@@ -1,6 +1,7 @@
 * Version 1.0.3 (unreleased)
 - When --no-decorate is given the default output will
   include no colors (#28)
+- Correctly split networks with /31 (#25)
 
 
 * Version 1.0.2 (released 2022-11-26)
