@@ -83,6 +83,10 @@ void show_split_networks_v4(unsigned split_prefix, const struct ip_info_st *info
 	start = net.s_addr;
 	end   = net.s_addr + diff - 1;
 
+	/* broadcast here is used to get maximum hosts in network. Set it to start + 1 for /31. */
+	if (info->prefix == 31)
+		broadcast.s_addr = start + 1;
+
 	/* Figure out max width of a network string. */
 	while (1) {
 		size_t len;
