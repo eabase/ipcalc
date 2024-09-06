@@ -72,8 +72,7 @@ pages-test:
     - ninja -C build
     - ninja -C build test
     - ninja -C build coverage-html && mv build/meson-logs/coveragereport public
-
-
+    - tests/run-coverage.sh
   tags:
   - shared
   except:
