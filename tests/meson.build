@@ -1254,6 +1254,14 @@ test('Deaggregate',
 		files('deaggregate-192.168.2.0-192.168.3.255')
 	]
 )
+test('DeaggregateLargeNum',
+	testrunner,
+	args : [
+		'--test-outfile',
+		ipcalc.full_path() + ' -d 240.0.0.0-255.255.255.255',
+		files('deaggregate-240.0.0.0-255.255.255.255')
+	]
+)
 test('DeaggregateSpaces',
 	testrunner,
 	args : [

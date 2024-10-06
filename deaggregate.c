@@ -103,7 +103,8 @@ void deaggregate_v4(const char *ip1s, const char *ip2s, unsigned flags)
 {
 	struct in_addr ip1, ip2;
 	unsigned step;
-	uint32_t base, end;
+	uint32_t end;
+	uint64_t base;
 	unsigned jsonchain;
 
 	if (inet_pton(AF_INET, ip1s, &ip1) <= 0) {
