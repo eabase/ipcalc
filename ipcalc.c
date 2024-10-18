@@ -1896,10 +1896,14 @@ int main(int argc, char **argv)
 		}
 
 		if (flags & FLAG_SHOW_REVERSE) {
+			char quotes[2] = { 0, 0 };
+
 			if (! (flags & FLAG_NO_DECORATE)) {
 				printf(REVERSEDNS_NAME"=");
+				if (strchr(info.reverse_dns, ' '))
+					quotes[0] = '"';
 			}
-			printf("%s\n", info.reverse_dns);
+			printf("%s%s%s\n", quotes, info.reverse_dns, quotes);
 		}
 
 		if ((flags & FLAG_SHOW_MINADDR) && info.hostmin) {

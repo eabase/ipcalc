@@ -108,6 +108,8 @@ a netmask or a CIDR prefix as well.
 
 * **--reverse-dns**
   Display the reverse DNS for the given IP address and netmask.
+  For some IPv6 prefixes it may result in multiple domain names separated
+  by spaces. Quotes will be used in that case.
   The variable exposed is REVERSEDNS.
 
 * **--minaddr**

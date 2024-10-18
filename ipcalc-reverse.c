@@ -98,17 +98,12 @@ static char hexchar(unsigned int val)
 	abort();
 }
 
-char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix)
+static int calc_reverse_dns6_one(struct in6_addr *ip, unsigned prepend, int max, int j, char *str)
 {
-	unsigned i, j = 0;
-	char str[256];
-	unsigned max = prefix/8;
+	unsigned i;
 
-	if (prefix % 4 != 0)
-		return NULL;
-
-	if (prefix % 8 == 4) {
-		str[j++] = hexchar(ip->s6_addr[(prefix+4)/8-1] >> 4);
+	if (prepend) {
+		str[j++] = hexchar(ip->s6_addr[max] >> 4);
 		str[j++] = '.';
 	}
 
@@ -122,6 +117,39 @@ char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix)
 	}
 
 	strcpy(&str[j], "ip6.arpa.");
+	j += 9;
+	return j;
+}
+
+char *calc_reverse_dns6(struct in6_addr *ip, unsigned prefix)
+{
+	unsigned j = 0;
+	// reverse of ipv6 can be 73 characters long, plus dividing space
+	// ipv6 can have max 8 networks for a single prefix
+	char str[74*8+1];
+	unsigned int max = prefix/8;
+	unsigned int remain4 = prefix % 4;
+	unsigned int remain8 = prefix % 8;
+
+	if (remain4 == 0)
+		j = calc_reverse_dns6_one(ip, (remain8 >= 4), max, j, str);
+	else {
+		unsigned int i, c;
+		unsigned int networks = 1u << (4 - remain4);
+		unsigned int shift = (1-(remain8 / 4)) * 4;
+
+		for (i=0; i<networks; i++) {
+			if (i>0)
+				str[j++] = ' ';
+			if (remain4>1) {
+				// network is correctly masked according to prefix
+				c = (ip->s6_addr[max] >> shift) & 0xf;
+				str[j++] = hexchar(i+c);
+				str[j++] = '.';
+			}
+			j = calc_reverse_dns6_one(ip, (shift == 0), max, j, str);
+		}
+	}
 
 	return strdup(str);
 }
